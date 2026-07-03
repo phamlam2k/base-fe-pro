@@ -1,0 +1,36 @@
+import { redirect } from "next/navigation";
+
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { AppHeader } from "@/components/layout/app-header";
+import { AppSidebar } from "@/components/layout/app-sidebar";
+import { ROUTES } from "@/config/routes";
+import { getCurrentUser } from "@/lib/auth/session";
+import { SessionProvider } from "@/providers/session-provider";
+
+/**
+ * Protected shell. The proxy already blocks unauthenticated requests, but we
+ * re-check here (defense in depth) and resolve the user server-side once so
+ * every client component can read it from context without a fetch.
+ */
+export default async function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect(ROUTES.login);
+  }
+
+  return (
+    <SessionProvider user={user}>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <AppHeader />
+          <main className="flex-1 p-4 md:p-6">{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </SessionProvider>
+  );
+}
