@@ -26,7 +26,7 @@ Lần đầu chạy E2E cần cài browser: `npx playwright install chromium`.
 
 ### 1. Mock ở NETWORK boundary, không mock module
 
-Sai lầm phổ biến là `vi.mock("@/features/products/hooks")` — test kiểu đó chỉ chứng minh mock hoạt động. Ở đây dùng **MSW** (`src/test/msw/`): request đi qua **axios thật → interceptor thật → react-query thật**, chỉ có HTTP response là giả. Đổi implementation không làm gãy test; đổi behavior mới làm gãy test. Đó chính là mục đích.
+Sai lầm phổ biến là `vi.mock("@/features/manage-user/model/hooks")` — test kiểu đó chỉ chứng minh mock hoạt động. Ở đây dùng **MSW** (`src/test/msw/`): request đi qua **axios thật → interceptor thật → react-query thật**, chỉ có HTTP response là giả. Đổi implementation không làm gãy test; đổi behavior mới làm gãy test. Đó chính là mục đích.
 
 ```ts
 // Override handler cho một test case cụ thể:
@@ -77,7 +77,7 @@ Luôn dùng `renderWithProviders` từ `@/test/test-utils` (i18n + react-query +
 | Màn hình: fetch → render → tương tác → mutate | Integration | `products-view.test.tsx` |
 | Journey xuyên trang + proxy + cookie thật | E2E | `e2e/auth.spec.ts`, `e2e/rbac.spec.ts`, `e2e/products.spec.ts` |
 
-**Không test**: `components/ui/**` (code generated của shadcn), page files mỏng (E2E đã phủ), styles.
+**Không test**: `shared/ui/**` (code generated của shadcn), page files mỏng (E2E đã phủ), styles.
 
 ## Quy ước
 
