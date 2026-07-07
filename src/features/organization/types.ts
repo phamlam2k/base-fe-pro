@@ -1,48 +1,32 @@
-import type { ListParams } from "@/shared/api/types";
-// Company graduated to its own entity; re-export for the (not-yet-migrated)
-// rest of the organization domain. `CompanyStatus` is reused by Project below.
+// Entities that have graduated out of the monolith; re-exported here for the
+// (not-yet-migrated) rest of the organization domain. `CompanyStatus` is reused
+// by Project below.
 import { COMPANY_STATUSES } from "@/entities/company";
 import type {
   Company,
   CompanyStatus,
   CompanyListParams,
 } from "@/entities/company";
+import { ORG_ROLES } from "@/entities/company-member";
+import type {
+  Member,
+  OrgRole,
+  MemberListParams,
+} from "@/entities/company-member";
 
-export { COMPANY_STATUSES };
+export { COMPANY_STATUSES, ORG_ROLES };
 export type { Company, CompanyStatus, CompanyListParams };
+export type { Member, OrgRole, MemberListParams };
 
 /**
- * Organization / RBAC domain types.
- *
- * Mirrors the backend design in `thiet-ke-phan-quyen-rbac.md`:
- * Platform (SuperAdmin) → Company (Admin / Delegate / Member) →
- * Project (Member) → Team tree (TVGS / Nhà Thầu / Thí Nghiệm).
+ * Organization / RBAC domain types (not-yet-migrated: project, team, ...).
  */
-
-/** Roles a person can hold inside a company. SuperAdmin is platform-level. */
-export const ORG_ROLES = [
-  "COMPANY_ADMIN",
-  "COMPANY_DELEGATE",
-  "COMPANY_MEMBER",
-] as const;
-export type OrgRole = (typeof ORG_ROLES)[number];
 
 export const TEAM_TYPES = ["SUPERVISION", "CONTRACTOR", "TESTING"] as const;
 export type TeamType = (typeof TEAM_TYPES)[number];
 
 export const TEAM_ROLES = ["TEAM_LEAD", "TEAM_MEMBER"] as const;
 export type TeamRole = (typeof TEAM_ROLES)[number];
-
-export interface Member {
-  id: string;
-  companyId: string;
-  name: string;
-  email: string;
-  role: OrgRole;
-  /** Custom job title, mainly for COMPANY_DELEGATE (e.g. "Phó Tổng Giám đốc"). */
-  customTitle: string;
-  createdAt: string;
-}
 
 export interface Project {
   id: string;
@@ -89,10 +73,4 @@ export interface UserOption {
   id: string;
   name: string;
   email: string;
-}
-
-export interface MemberListParams extends ListParams {
-  companyId: string;
-  role?: OrgRole | "all";
-  sortBy?: "name" | "email" | "createdAt";
 }

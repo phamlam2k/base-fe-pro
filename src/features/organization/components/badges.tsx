@@ -3,18 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/shared/ui/badge";
-import type { OrgRole, TeamType } from "@/features/organization/types";
-
-const ROLE_VARIANT: Record<OrgRole, "default" | "secondary" | "outline"> = {
-  COMPANY_ADMIN: "default",
-  COMPANY_DELEGATE: "secondary",
-  COMPANY_MEMBER: "outline",
-};
-
-export function RoleBadge({ role }: { role: OrgRole }) {
-  const t = useTranslations("organization");
-  return <Badge variant={ROLE_VARIANT[role]}>{t(`roles.${role}`)}</Badge>;
-}
+import type { TeamType } from "@/features/organization/types";
 
 const TEAM_TYPE_STYLE: Record<TeamType, string> = {
   SUPERVISION: "border-blue-300 text-blue-700 dark:text-blue-300",

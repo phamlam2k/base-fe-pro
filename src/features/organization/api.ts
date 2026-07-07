@@ -1,17 +1,13 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
 import { apiClient } from "@/shared/api/axios";
-import type { ApiResponse, Paginated } from "@/shared/api/types";
+import type { ApiResponse } from "@/shared/api/types";
 import type {
-  MemberFormValues,
   ProjectFormValues,
   TeamFormValues,
   TeamMemberFormValues,
 } from "@/features/organization/schemas";
 import type {
-  Member,
-  MemberListParams,
-  OrgRole,
   Project,
   ProjectMember,
   Team,
@@ -20,11 +16,6 @@ import type {
   UserOption,
 } from "@/features/organization/types";
 
-export interface MemberCreateInput {
-  userId: string;
-  role: OrgRole;
-  customTitle?: string;
-}
 export interface TeamMemberCreateInput {
   userId: string;
   role: TeamRole;
@@ -34,38 +25,14 @@ const BASE = "/organization";
 
 /** Raw HTTP calls — the contract only, no caching concerns. */
 export const organizationApi = {
-  // Companies moved to entities/company (companyApi).
-  // --- Company members (roles: Admin / Delegate / Member) ---
-  listMembers: async (params: MemberListParams): Promise<Paginated<Member>> => {
-    const res = await apiClient.get<ApiResponse<Paginated<Member>>>(
-      `${BASE}/members`,
-      { params },
-    );
-    return res.data.data;
-  },
+  // Companies → entities/company, company members → entities/company-member.
+  // --- User lookup (member picker) ---
   lookupUsers: async (search: string): Promise<UserOption[]> => {
     const res = await apiClient.get<ApiResponse<UserOption[]>>(
       `${BASE}/users/lookup`,
       { params: { search } },
     );
     return res.data.data;
-  },
-  createMember: async (
-    companyId: string,
-    input: MemberCreateInput,
-  ): Promise<Member> => {
-    const res = await apiClient.post<ApiResponse<Member>>(`${BASE}/members`, {
-      ...input,
-      companyId,
-    });
-    return res.data.data;
-  },
-  updateMember: async (id: string, input: Partial<MemberFormValues>): Promise<Member> => {
-    const res = await apiClient.patch<ApiResponse<Member>>(`${BASE}/members/${id}`, input);
-    return res.data.data;
-  },
-  removeMember: async (id: string): Promise<void> => {
-    await apiClient.delete(`${BASE}/members/${id}`);
   },
 
   // --- Projects ---
@@ -173,10 +140,6 @@ export const organizationApi = {
 export const organizationKeys = {
   all: ["organization"] as const,
 
-  members: () => [...organizationKeys.all, "members"] as const,
-  memberList: (params: MemberListParams) =>
-    [...organizationKeys.members(), params] as const,
-
   projects: (companyId: string) =>
     [...organizationKeys.all, "projects", companyId] as const,
 
@@ -192,15 +155,6 @@ export const organizationKeys = {
   userLookup: (search: string) =>
     [...organizationKeys.all, "user-lookup", search] as const,
 };
-
-export function memberListOptions(params: MemberListParams) {
-  return queryOptions({
-    queryKey: organizationKeys.memberList(params),
-    queryFn: () => organizationApi.listMembers(params),
-    placeholderData: keepPreviousData,
-    enabled: Boolean(params.companyId),
-  });
-}
 
 export function projectListOptions(companyId: string) {
   return queryOptions({

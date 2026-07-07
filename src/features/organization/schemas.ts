@@ -1,14 +1,19 @@
 import { z } from "zod";
 
-import { ORG_ROLES, TEAM_ROLES, TEAM_TYPES } from "@/features/organization/types";
+import { TEAM_ROLES, TEAM_TYPES } from "@/features/organization/types";
 
-// Company schemas graduated to the company entity; re-export for the rest of
-// the (not-yet-migrated) organization domain.
+// Company + company-member schemas graduated to their entities; re-export for
+// the (not-yet-migrated) rest of the organization domain.
 export {
   createCompanyFormSchema,
   companyListQuerySchema,
 } from "@/entities/company";
 export type { CompanyFormValues } from "@/entities/company";
+export {
+  createMemberFormSchema,
+  memberListQuerySchema,
+} from "@/entities/company-member";
+export type { MemberFormValues } from "@/entities/company-member";
 
 /**
  * Schema factory pattern (see users/schemas.ts): the client passes a
@@ -16,17 +21,6 @@ export type { CompanyFormValues } from "@/entities/company";
  * calls the factory with no argument and gets the English fallbacks.
  */
 type TFn = (key: string) => string;
-
-export function createMemberFormSchema(t?: TFn) {
-  const msg = (key: string, fallback: string) => (t ? t(key) : fallback);
-  // The person is picked from existing users (userId handled outside the form);
-  // this schema only covers the editable role + title.
-  return z.object({
-    role: z.enum(ORG_ROLES, { message: msg("validation.roleRequired", "Chọn vai trò") }),
-    customTitle: z.string().max(100).optional(),
-  });
-}
-export type MemberFormValues = z.infer<ReturnType<typeof createMemberFormSchema>>;
 
 export function createProjectFormSchema(t?: TFn) {
   const msg = (key: string, fallback: string) => (t ? t(key) : fallback);
@@ -72,16 +66,3 @@ export function createTeamMemberFormSchema(t?: TFn) {
 export type TeamMemberFormValues = z.infer<
   ReturnType<typeof createTeamMemberFormSchema>
 >;
-
-// ---------------------------------------------------------------------------
-// Query-string schemas used by the API proxy routes (server-side).
-// ---------------------------------------------------------------------------
-export const memberListQuerySchema = z.object({
-  companyId: z.string().min(1),
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
-  search: z.string().optional(),
-  role: z.enum([...ORG_ROLES, "all"]).optional(),
-  sortBy: z.enum(["name", "email", "createdAt"]).default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
-});

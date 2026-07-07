@@ -16,7 +16,7 @@ import {
 } from "@/shared/ui/select";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/shared/ui/permission-gate";
-import { RoleBadge } from "@/features/organization/components/badges";
+import { MemberRoleBadge } from "@/entities/company-member";
 import {
   useCreateProjectMember,
   useDeleteProjectMember,
@@ -110,7 +110,7 @@ export function ProjectMembersCard({
                   <span className="text-base font-medium">{member.name || "—"}</span>
                   <span className="text-muted-foreground text-xs">{member.email}</span>
                 </div>
-                <RoleBadge role="COMPANY_MEMBER" />
+                <MemberRoleBadge role="COMPANY_MEMBER" />
                 <PermissionGate permission="orgs:manage">
                   <Button
                     variant="ghost"

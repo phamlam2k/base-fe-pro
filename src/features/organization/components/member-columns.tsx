@@ -15,7 +15,7 @@ import {
 import { DataTableColumnHeader } from "@/shared/ui/data-table/data-table-column-header";
 import { PermissionGate } from "@/shared/ui/permission-gate";
 import { usePermission } from "@/providers/session-provider";
-import { RoleBadge } from "@/features/organization/components/badges";
+import { MemberRoleBadge } from "@/entities/company-member";
 import type { Member } from "@/features/organization/types";
 
 function initialsOf(name: string): string {
@@ -96,7 +96,7 @@ export function getMemberColumns({
     {
       accessorKey: "role",
       header: t("members.colRole"),
-      cell: ({ row }) => <RoleBadge role={row.original.role} />,
+      cell: ({ row }) => <MemberRoleBadge role={row.original.role} />,
     },
     {
       accessorKey: "customTitle",
