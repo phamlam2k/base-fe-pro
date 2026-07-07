@@ -2,14 +2,14 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { dashboardOptions } from "@/features/dashboard/api";
+import { dashboardOptions } from "@/widgets/dashboard-overview/api/dashboard.api";
 import {
   RevenueChart,
   RolesChart,
   SignupsChart,
-} from "@/features/dashboard/components/charts";
-import { RecentUsers } from "@/features/dashboard/components/recent-users";
-import { StatsCards } from "@/features/dashboard/components/stats-cards";
+} from "./charts";
+import { RecentUsers } from "./recent-users";
+import { StatsCards } from "./stats-cards";
 
 export function DashboardView() {
   const { data, isPending } = useQuery(dashboardOptions());

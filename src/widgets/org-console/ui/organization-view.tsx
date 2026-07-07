@@ -20,10 +20,10 @@ import {
 } from "@/shared/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { CompanyStatusBadge } from "@/entities/company";
-import { CompaniesPanel } from "@/features/organization/views/companies-panel";
-import { MembersPanel } from "@/features/organization/views/members-panel";
-import { RoleLegend } from "@/features/organization/views/role-legend";
-import { StructurePanel } from "@/features/organization/views/structure-panel";
+import { CompaniesPanel } from "./companies-panel";
+import { MembersPanel } from "./members-panel";
+import { RoleLegend } from "./role-legend";
+import { StructurePanel } from "./structure-panel";
 import { useQuery } from "@tanstack/react-query";
 import { companyQueries } from "@/entities/company";
 import type { Company } from "@/features/organization/types";

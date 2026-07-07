@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { PageHeader } from "@/shared/ui/page-header";
-import { OrganizationView } from "@/features/organization";
+import { OrganizationView } from "@/widgets/org-console";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("organization");

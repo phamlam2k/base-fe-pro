@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   DEFAULT_PREFERENCES,
   usePreferencesStore,
-} from "@/stores/preferences-store";
+} from "./preferences-store";
 
 const root = () => document.documentElement;
 

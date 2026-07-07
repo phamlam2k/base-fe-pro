@@ -30,7 +30,7 @@ import {
   type ChartConfig,
 } from "@/shared/ui/chart";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type { DashboardData } from "@/features/dashboard/api";
+import type { DashboardData } from "@/widgets/dashboard-overview/api/dashboard.api";
 
 /** Format a "YYYY-MM" key as a localized short month label. */
 function useMonthLabel() {

@@ -1,7 +1,7 @@
 import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
 
-import { OrganizationView } from "@/features/organization/views/organization-view";
+import { OrganizationView } from "./organization-view";
 import { buildSessionUser } from "@/test/factories";
 import { server } from "@/test/msw/server";
 import { renderWithProviders, screen } from "@/test/test-utils";

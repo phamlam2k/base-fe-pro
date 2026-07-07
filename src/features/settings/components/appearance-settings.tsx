@@ -13,7 +13,7 @@ import {
 } from "@/shared/ui/card";
 import { Label } from "@/shared/ui/label";
 import { Separator } from "@/shared/ui/separator";
-import { ThemeCustomizerControls } from "@/components/layout/theme-customizer";
+import { ThemeCustomizerControls } from "@/features/theme";
 
 const MODES = [
   { value: "light", icon: Sun, labelKey: "light" },

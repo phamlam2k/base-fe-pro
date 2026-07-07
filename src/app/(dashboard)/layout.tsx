@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { SidebarInset, SidebarProvider } from "@/shared/ui/sidebar";
-import { AppHeader } from "@/components/layout/app-header";
-import { AppSidebar } from "@/components/layout/app-sidebar";
+import { AppHeader } from "@/widgets/app-header";
+import { AppSidebar } from "@/widgets/app-sidebar";
 import { ROUTES } from "@/shared/config/routes";
 import { getCurrentUser } from "@/shared/lib/auth/session";
 import { SessionProvider } from "@/entities/session";

@@ -17,7 +17,7 @@ import {
   THEME_PRESETS,
   usePreferencesStore,
   type ThemePreset,
-} from "@/stores/preferences-store";
+} from "@/features/theme/model/preferences-store";
 
 /** Swatch colors shown in the picker (light-mode primary of each preset). */
 const PRESET_SWATCHES: Record<ThemePreset, string> = {

@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
-import type { DashboardData } from "@/features/dashboard/api";
+import type { DashboardData } from "@/widgets/dashboard-overview/api/dashboard.api";
 
 export function StatsCards({
   stats,

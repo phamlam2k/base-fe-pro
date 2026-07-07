@@ -1,12 +1,12 @@
 /**
- * Public API of the `organization` feature (Access Management / RBAC console).
+ * `organization` — compatibility bridge (shrinking).
  *
- * External code (app/, other features) imports ONLY from here — ESLint blocks
- * deep imports. Internal components/columns stay private implementation details.
+ * The console UI graduated to `widgets/org-console`; the domain concepts to
+ * their entities. This module now only re-exports the org contract (status /
+ * role constants + list-param types) that the `app/api/organization/**` proxy
+ * route handlers still import. It disappears in P5 when those handlers point
+ * straight at the entities.
  */
-export { OrganizationView } from "./views/organization-view";
-export { RoleLegend } from "./views/role-legend";
-
 export {
   COMPANY_STATUSES,
   ORG_ROLES,

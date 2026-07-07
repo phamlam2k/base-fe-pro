@@ -5,11 +5,11 @@ import { useTranslations } from "next-intl";
 
 import { Separator } from "@/shared/ui/separator";
 import { SidebarTrigger } from "@/shared/ui/sidebar";
-import { CommandPalette } from "@/components/layout/command-palette";
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
-import { ThemeCustomizerPopover } from "@/components/layout/theme-customizer";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
-import { UserNav } from "@/components/layout/user-nav";
+import { CommandPalette } from "./command-palette";
+import { LocaleSwitcher } from "./locale-switcher";
+import { ThemeCustomizerPopover } from "@/features/theme";
+import { ThemeToggle } from "@/features/theme";
+import { UserNav } from "./user-nav";
 import { FeatureGate } from "@/shared/ui/feature-gate";
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { NotificationsBell } from "@/features/notifications";

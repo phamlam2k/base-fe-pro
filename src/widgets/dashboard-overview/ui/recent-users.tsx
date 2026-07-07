@@ -21,7 +21,7 @@ import { PermissionGate } from "@/entities/session";
 // API. Deep imports like "@/features/users/components/..." are an ESLint error.
 import { UserFormDialog } from "@/features/manage-user";
 import type { User } from "@/features/users";
-import { dashboardKeys } from "@/features/dashboard/api";
+import { dashboardKeys } from "@/widgets/dashboard-overview/api/dashboard.api";
 
 function initialsOf(name: string): string {
   return name

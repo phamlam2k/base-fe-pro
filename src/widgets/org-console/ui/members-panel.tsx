@@ -18,7 +18,7 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table/data-table";
 import { PermissionGate } from "@/entities/session";
 import { useDebounce } from "@/shared/lib/use-debounce";
-import { getMemberColumns } from "@/features/organization/components/member-columns";
+import { getMemberColumns } from "./member-columns";
 import { MemberFormDialog } from "@/features/manage-company-member";
 import { useQuery } from "@tanstack/react-query";
 import { companyMemberQueries } from "@/entities/company-member";

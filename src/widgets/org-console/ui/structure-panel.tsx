@@ -27,7 +27,7 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/entities/session";
 import { TeamTypeBadge } from "@/entities/team";
 import { ProjectFormDialog } from "@/features/manage-project";
-import { ProjectMembersCard } from "@/features/organization/views/project-members-card";
+import { ProjectMembersCard } from "./project-members-card";
 import { TeamFormDialog } from "@/features/manage-team";
 import { TeamMembersDialog } from "@/features/manage-team";
 import { useQuery } from "@tanstack/react-query";
