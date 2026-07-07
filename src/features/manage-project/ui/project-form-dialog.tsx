@@ -24,12 +24,12 @@ import {
   FormMessage,
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
-import { useCreateProject, useUpdateProject } from "@/features/organization/hooks";
+import { useCreateProject, useUpdateProject } from "../model/hooks";
 import {
   createProjectFormSchema,
   type ProjectFormValues,
-} from "@/features/organization/schemas";
-import type { Project } from "@/features/organization/types";
+} from "@/entities/project";
+import type { Project } from "@/entities/project";
 
 /** Create + edit a project in one dialog (`project` present → edit). */
 export function ProjectFormDialog({

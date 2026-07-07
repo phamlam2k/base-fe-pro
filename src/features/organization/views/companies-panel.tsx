@@ -23,8 +23,10 @@ import { PermissionGate } from "@/entities/session";
 import { usePermission } from "@/entities/session";
 import { useDebounce } from "@/shared/lib/use-debounce";
 import { CompanyStatusBadge } from "@/entities/company";
-import { CompanyFormDialog } from "@/features/organization/dialogs/company-form-dialog";
-import { useCompanies, useUpdateCompany } from "@/features/organization/hooks";
+import { CompanyFormDialog } from "@/features/manage-company";
+import { useQuery } from "@tanstack/react-query";
+import { companyQueries } from "@/entities/company";
+import { useUpdateCompany } from "@/features/manage-company";
 import type { Company, CompanyListParams } from "@/features/organization/types";
 
 export function CompaniesPanel() {
@@ -51,7 +53,7 @@ export function CompaniesPanel() {
     sortOrder: sorting[0]?.desc === false ? "asc" : "desc",
   };
 
-  const companiesQuery = useCompanies(params);
+  const companiesQuery = useQuery(companyQueries.list(params));
 
   const columns = React.useMemo<ColumnDef<Company>[]>(
     () => [

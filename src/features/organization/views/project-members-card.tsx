@@ -17,12 +17,10 @@ import {
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/entities/session";
 import { MemberRoleBadge } from "@/entities/company-member";
-import {
-  useCreateProjectMember,
-  useDeleteProjectMember,
-  useMembers,
-  useProjectMembers,
-} from "@/features/organization/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { companyMemberQueries } from "@/entities/company-member";
+import { projectMemberQueries } from "@/entities/project-member";
+import { useCreateProjectMember, useDeleteProjectMember } from "@/features/manage-project-member";
 import type { ProjectMember } from "@/features/organization/types";
 
 /**
@@ -37,13 +35,15 @@ export function ProjectMembersCard({
   projectId: string;
 }) {
   const t = useTranslations("organization");
-  const membersQuery = useProjectMembers(projectId);
-  const companyMembersQuery = useMembers({
-    companyId,
-    page: 1,
-    pageSize: 100,
-    role: "all",
-  });
+  const membersQuery = useQuery(projectMemberQueries.list(projectId));
+  const companyMembersQuery = useQuery(
+    companyMemberQueries.list({
+      companyId,
+      page: 1,
+      pageSize: 100,
+      role: "all",
+    }),
+  );
   const createMember = useCreateProjectMember(projectId);
   const deleteMember = useDeleteProjectMember();
 

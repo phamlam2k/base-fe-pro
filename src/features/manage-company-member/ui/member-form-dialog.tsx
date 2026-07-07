@@ -34,15 +34,13 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { UserPicker } from "@/features/pick-user";
-import {
-  useCreateMember,
-  useUpdateMember,
-} from "@/features/organization/hooks";
+import { useCreateMember, useUpdateMember } from "../model/hooks";
 import {
   createMemberFormSchema,
   type MemberFormValues,
-} from "@/features/organization/schemas";
-import { ORG_ROLES, type Member, type UserOption } from "@/features/organization/types";
+} from "@/entities/company-member";
+import { ORG_ROLES, type Member } from "@/entities/company-member";
+import type { UserOption } from "@/entities/user";
 
 /** Add (pick an existing user) or edit a company member's role/title. */
 export function MemberFormDialog({

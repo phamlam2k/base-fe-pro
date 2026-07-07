@@ -8,20 +8,6 @@ export { OrganizationView } from "./views/organization-view";
 export { RoleLegend } from "./views/role-legend";
 
 export {
-  useCompanies,
-  useMembers,
-  useProjects,
-  useTeams,
-  useCreateCompany,
-  useUpdateCompany,
-  useCreateMember,
-  useUpdateMember,
-  useDeleteMember,
-  useCreateProject,
-  useCreateTeam,
-} from "./hooks";
-
-export {
   COMPANY_STATUSES,
   ORG_ROLES,
   TEAM_TYPES,

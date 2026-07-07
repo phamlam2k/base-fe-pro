@@ -32,12 +32,13 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { UserPicker } from "@/features/pick-user";
-import { useCreateTeamMember } from "@/features/organization/hooks";
+import { useCreateTeamMember } from "../model/hooks";
 import {
   createTeamMemberFormSchema,
   type TeamMemberFormValues,
-} from "@/features/organization/schemas";
-import { TEAM_ROLES, type UserOption } from "@/features/organization/types";
+} from "@/entities/team-member";
+import { TEAM_ROLES } from "@/entities/team-member";
+import type { UserOption } from "@/entities/user";
 
 /** Pick an existing user and add them to a team as Lead or Member. */
 export function TeamMemberFormDialog({

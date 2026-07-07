@@ -32,12 +32,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { useCreateTeam, useUpdateTeam } from "@/features/organization/hooks";
+import { useCreateTeam, useUpdateTeam } from "../model/hooks";
 import {
   createTeamFormSchema,
   type TeamFormValues,
-} from "@/features/organization/schemas";
-import { TEAM_TYPES, type Team } from "@/features/organization/types";
+} from "@/entities/team";
+import { TEAM_TYPES, type Team } from "@/entities/team";
 
 /**
  * Create a team. SUPERVISION teams are roots (no parent); CONTRACTOR/TESTING

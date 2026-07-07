@@ -24,7 +24,8 @@ import { CompaniesPanel } from "@/features/organization/views/companies-panel";
 import { MembersPanel } from "@/features/organization/views/members-panel";
 import { RoleLegend } from "@/features/organization/views/role-legend";
 import { StructurePanel } from "@/features/organization/views/structure-panel";
-import { useCompanies } from "@/features/organization/hooks";
+import { useQuery } from "@tanstack/react-query";
+import { companyQueries } from "@/entities/company";
 import type { Company } from "@/features/organization/types";
 
 /**
@@ -36,7 +37,7 @@ export function OrganizationView() {
   const t = useTranslations("organization");
 
   // Load all companies once to drive the picker (small dataset).
-  const companiesQuery = useCompanies({ page: 1, pageSize: 100 });
+  const companiesQuery = useQuery(companyQueries.list({ page: 1, pageSize: 100 }));
   const companies = companiesQuery.data?.items ?? [];
 
   // Derive the active company during render (no effect): the user's explicit

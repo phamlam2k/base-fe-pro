@@ -19,8 +19,10 @@ import { DataTable } from "@/shared/ui/data-table/data-table";
 import { PermissionGate } from "@/entities/session";
 import { useDebounce } from "@/shared/lib/use-debounce";
 import { getMemberColumns } from "@/features/organization/components/member-columns";
-import { MemberFormDialog } from "@/features/organization/dialogs/member-form-dialog";
-import { useDeleteMember, useMembers } from "@/features/organization/hooks";
+import { MemberFormDialog } from "@/features/manage-company-member";
+import { useQuery } from "@tanstack/react-query";
+import { companyMemberQueries } from "@/entities/company-member";
+import { useDeleteMember } from "@/features/manage-company-member";
 import {
   ORG_ROLES,
   type Member,
@@ -57,7 +59,7 @@ export function MembersPanel({ companyId }: { companyId: string }) {
     sortOrder: sorting[0]?.desc === false ? "asc" : "desc",
   };
 
-  const membersQuery = useMembers(params);
+  const membersQuery = useQuery(companyMemberQueries.list(params));
   const deleteMember = useDeleteMember();
 
   const [dialog, setDialog] = React.useState<DialogState>(null);

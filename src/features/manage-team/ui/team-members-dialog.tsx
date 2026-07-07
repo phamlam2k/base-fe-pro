@@ -18,12 +18,12 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/entities/session";
 import { TeamTypeBadge } from "@/entities/team";
-import { TeamMemberFormDialog } from "@/features/organization/dialogs/team-member-form-dialog";
-import {
-  useDeleteTeamMember,
-  useTeamMembers,
-} from "@/features/organization/hooks";
-import type { Team, TeamMember } from "@/features/organization/types";
+import { TeamMemberFormDialog } from "./team-member-form-dialog";
+import { useQuery } from "@tanstack/react-query";
+import { teamMemberQueries } from "@/entities/team-member";
+import { useDeleteTeamMember } from "../model/hooks";
+import type { Team } from "@/entities/team";
+import type { TeamMember } from "@/entities/team-member";
 
 function initialsOf(value: string) {
   return value.split(" ").map((p) => p[0]).filter(Boolean).slice(-2).join("").toUpperCase();
@@ -42,7 +42,7 @@ export function TeamMembersDialog({
   const t = useTranslations("organization");
   const format = useFormatter();
   const teamId = team?.id ?? "";
-  const membersQuery = useTeamMembers(teamId);
+  const membersQuery = useQuery(teamMemberQueries.list(teamId));
   const deleteMember = useDeleteTeamMember();
 
   const [addOpen, setAddOpen] = React.useState(false);

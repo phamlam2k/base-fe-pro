@@ -26,23 +26,22 @@ import { cn } from "@/shared/lib/utils";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/entities/session";
 import { TeamTypeBadge } from "@/entities/team";
-import { ProjectFormDialog } from "@/features/organization/dialogs/project-form-dialog";
+import { ProjectFormDialog } from "@/features/manage-project";
 import { ProjectMembersCard } from "@/features/organization/views/project-members-card";
-import { TeamFormDialog } from "@/features/organization/dialogs/team-form-dialog";
-import { TeamMembersDialog } from "@/features/organization/dialogs/team-members-dialog";
-import {
-  useDeleteProject,
-  useDeleteTeam,
-  useProjects,
-  useTeams,
-} from "@/features/organization/hooks";
+import { TeamFormDialog } from "@/features/manage-team";
+import { TeamMembersDialog } from "@/features/manage-team";
+import { useQuery } from "@tanstack/react-query";
+import { projectQueries } from "@/entities/project";
+import { teamQueries } from "@/entities/team";
+import { useDeleteProject } from "@/features/manage-project";
+import { useDeleteTeam } from "@/features/manage-team";
 import { TEAM_TYPES, type Project, type Team, type TeamType } from "@/features/organization/types";
 
 type ProjectDialog = { mode: "create" } | { mode: "edit"; project: Project } | null;
 
 export function StructurePanel({ companyId }: { companyId: string }) {
   const t = useTranslations("organization");
-  const projectsQuery = useProjects(companyId);
+  const projectsQuery = useQuery(projectQueries.list(companyId));
   const projects = React.useMemo(() => projectsQuery.data ?? [], [projectsQuery.data]);
   const deleteProject = useDeleteProject();
 
@@ -144,7 +143,7 @@ type TeamDialog = { mode: "create" } | { mode: "edit"; team: Team } | null;
 
 function TeamTree({ projectId }: { projectId: string }) {
   const t = useTranslations("organization");
-  const teamsQuery = useTeams(projectId);
+  const teamsQuery = useQuery(teamQueries.list(projectId));
   const teams = teamsQuery.data ?? [];
   const deleteTeam = useDeleteTeam();
 

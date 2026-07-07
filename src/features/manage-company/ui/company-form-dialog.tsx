@@ -24,11 +24,11 @@ import {
   FormMessage,
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
-import { useCreateCompany } from "@/features/organization/hooks";
+import { useCreateCompany } from "../model/hooks";
 import {
   createCompanyFormSchema,
   type CompanyFormValues,
-} from "@/features/organization/schemas";
+} from "@/entities/company";
 
 /** Create a new company (platform / SuperAdmin action). */
 export function CompanyFormDialog({
