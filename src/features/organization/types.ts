@@ -1,76 +1,19 @@
-// Entities that have graduated out of the monolith; re-exported here for the
-// (not-yet-migrated) rest of the organization domain. `CompanyStatus` is reused
-// by Project below.
-import { COMPANY_STATUSES } from "@/entities/company";
-import type {
-  Company,
-  CompanyStatus,
-  CompanyListParams,
-} from "@/entities/company";
-import { ORG_ROLES } from "@/entities/company-member";
-import type {
-  Member,
-  OrgRole,
-  MemberListParams,
-} from "@/entities/company-member";
-
-export { COMPANY_STATUSES, ORG_ROLES };
-export type { Company, CompanyStatus, CompanyListParams };
-export type { Member, OrgRole, MemberListParams };
-
 /**
- * Organization / RBAC domain types (not-yet-migrated: project, team, ...).
+ * Organization domain — compatibility bridge.
+ *
+ * Every concept has graduated to its own FSD entity. This module re-exports
+ * them so the not-yet-migrated organization UI + proxy routes keep compiling
+ * (feature → entity is a valid downward FSD import). It disappears once P3–P5
+ * repoint the remaining consumers directly at the entities.
  */
-
-export const TEAM_TYPES = ["SUPERVISION", "CONTRACTOR", "TESTING"] as const;
-export type TeamType = (typeof TEAM_TYPES)[number];
-
-export const TEAM_ROLES = ["TEAM_LEAD", "TEAM_MEMBER"] as const;
-export type TeamRole = (typeof TEAM_ROLES)[number];
-
-export interface Project {
-  id: string;
-  companyId: string;
-  name: string;
-  status: CompanyStatus;
-  teamCount: number;
-  createdAt: string;
-}
-
-export interface Team {
-  id: string;
-  projectId: string;
-  parentTeamId: string | null;
-  teamType: TeamType;
-  name: string;
-  memberCount: number;
-  createdAt: string;
-}
-
-/** A person inside a team (TVGS / Nhà Thầu / Thí Nghiệm). Invited by email. */
-export interface TeamMember {
-  id: string;
-  teamId: string;
-  name: string;
-  email: string;
-  role: TeamRole;
-  createdAt: string;
-}
-
-/** An internal company member assigned to a project (chủ đầu tư side). */
-export interface ProjectMember {
-  id: string;
-  projectId: string;
-  companyMemberId: string;
-  name: string;
-  email: string;
-  role: string;
-  createdAt: string;
-}
-
-/** Minimal existing-user info returned by the member picker (id/name/email). */
-export interface UserOption {
-  id: string;
-  name: string;
-  email: string;
-}
+export { COMPANY_STATUSES } from "@/entities/company";
+export type { Company, CompanyStatus, CompanyListParams } from "@/entities/company";
+export { ORG_ROLES } from "@/entities/company-member";
+export type { Member, OrgRole, MemberListParams } from "@/entities/company-member";
+export type { Project, ProjectStatus } from "@/entities/project";
+export { TEAM_TYPES } from "@/entities/team";
+export type { Team, TeamType } from "@/entities/team";
+export { TEAM_ROLES } from "@/entities/team-member";
+export type { TeamMember, TeamRole } from "@/entities/team-member";
+export type { ProjectMember } from "@/entities/project-member";
+export type { UserOption } from "@/entities/user";

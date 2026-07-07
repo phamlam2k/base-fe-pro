@@ -5,15 +5,14 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
-  userKeys,
-  userListOptions,
-  usersApi,
-} from "@/features/users/api";
-import type { UserFormValues } from "@/features/users/schemas";
-import type { UserListParams } from "@/features/users/types";
+  userApi,
+  userQueries,
+  type UserFormValues,
+  type UserListParams,
+} from "@/entities/user";
 
 export function useUsers(params: UserListParams) {
-  return useQuery(userListOptions(params));
+  return useQuery(userQueries.list(params));
 }
 
 export function useCreateUser() {
@@ -21,10 +20,10 @@ export function useCreateUser() {
   const t = useTranslations("users");
 
   return useMutation({
-    mutationFn: (input: UserFormValues) => usersApi.create(input),
+    mutationFn: (input: UserFormValues) => userApi.create(input),
     onSuccess: () => {
       toast.success(t("created"));
-      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: userQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -36,10 +35,10 @@ export function useUpdateUser() {
 
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Partial<UserFormValues> }) =>
-      usersApi.update(id, input),
+      userApi.update(id, input),
     onSuccess: () => {
       toast.success(t("updated"));
-      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: userQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -50,10 +49,10 @@ export function useDeleteUser() {
   const t = useTranslations("users");
 
   return useMutation({
-    mutationFn: (id: string) => usersApi.remove(id),
+    mutationFn: (id: string) => userApi.remove(id),
     onSuccess: () => {
       toast.success(t("deleted"));
-      queryClient.invalidateQueries({ queryKey: userKeys.all });
+      queryClient.invalidateQueries({ queryKey: userQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });

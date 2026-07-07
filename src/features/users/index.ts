@@ -16,8 +16,8 @@ export {
   useDeleteUser,
 } from "./hooks";
 
-// Query keys/options phải share toàn app — react-query cache là một cây chung.
-export { userKeys, userListOptions, usersApi } from "./api";
+// Entity data-access (query-options factory) lives in the `user` entity.
+export { userApi, userQueries } from "@/entities/user";
 
 export { SUPER_ADMIN_FILTERS } from "./types";
 export type { User, SuperAdminFilter, UserListParams } from "./types";

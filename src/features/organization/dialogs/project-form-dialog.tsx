@@ -46,7 +46,7 @@ export function ProjectFormDialog({
   const t = useTranslations("organization");
   const tCommon = useTranslations("common");
   const createProject = useCreateProject(companyId);
-  const updateProject = useUpdateProject(companyId);
+  const updateProject = useUpdateProject();
   const isPending = createProject.isPending || updateProject.isPending;
 
   const schema = React.useMemo(() => createProjectFormSchema(t), [t]);

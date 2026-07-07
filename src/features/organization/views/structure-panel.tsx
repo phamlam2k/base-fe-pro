@@ -25,7 +25,7 @@ import {
 import { cn } from "@/shared/lib/utils";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/shared/ui/permission-gate";
-import { TeamTypeBadge } from "@/features/organization/components/badges";
+import { TeamTypeBadge } from "@/entities/team";
 import { ProjectFormDialog } from "@/features/organization/dialogs/project-form-dialog";
 import { ProjectMembersCard } from "@/features/organization/views/project-members-card";
 import { TeamFormDialog } from "@/features/organization/dialogs/team-form-dialog";
@@ -44,7 +44,7 @@ export function StructurePanel({ companyId }: { companyId: string }) {
   const t = useTranslations("organization");
   const projectsQuery = useProjects(companyId);
   const projects = React.useMemo(() => projectsQuery.data ?? [], [projectsQuery.data]);
-  const deleteProject = useDeleteProject(companyId);
+  const deleteProject = useDeleteProject();
 
   const [picked, setPicked] = React.useState<string | null>(null);
   const [projectDialog, setProjectDialog] = React.useState<ProjectDialog>(null);
@@ -146,7 +146,7 @@ function TeamTree({ projectId }: { projectId: string }) {
   const t = useTranslations("organization");
   const teamsQuery = useTeams(projectId);
   const teams = teamsQuery.data ?? [];
-  const deleteTeam = useDeleteTeam(projectId);
+  const deleteTeam = useDeleteTeam();
 
   const [teamDialog, setTeamDialog] = React.useState<TeamDialog>(null);
   const [membersTeam, setMembersTeam] = React.useState<Team | null>(null);

@@ -21,8 +21,6 @@ export {
   useCreateTeam,
 } from "./hooks";
 
-export { organizationApi, organizationKeys } from "./api";
-
 export {
   COMPANY_STATUSES,
   ORG_ROLES,

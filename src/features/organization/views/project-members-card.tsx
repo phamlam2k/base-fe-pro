@@ -45,7 +45,7 @@ export function ProjectMembersCard({
     role: "all",
   });
   const createMember = useCreateProjectMember(projectId);
-  const deleteMember = useDeleteProjectMember(projectId);
+  const deleteMember = useDeleteProjectMember();
 
   const [picked, setPicked] = React.useState<string>("");
   const [toRemove, setToRemove] = React.useState<ProjectMember | null>(null);

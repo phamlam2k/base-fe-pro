@@ -17,21 +17,16 @@ import {
   type MemberFormValues,
   type MemberListParams,
 } from "@/entities/company-member";
+import { projectApi, projectQueries, type ProjectFormValues } from "@/entities/project";
+import { projectMemberApi, projectMemberQueries } from "@/entities/project-member";
+import { teamApi, teamQueries, type TeamFormValues } from "@/entities/team";
 import {
-  organizationApi,
-  organizationKeys,
-  projectListOptions,
-  projectMemberListOptions,
-  teamListOptions,
-  teamMemberListOptions,
-  userLookupOptions,
+  teamMemberApi,
+  teamMemberQueries,
   type TeamMemberCreateInput,
-} from "@/features/organization/api";
-import type {
-  ProjectFormValues,
-  TeamFormValues,
-  TeamMemberFormValues,
-} from "@/features/organization/schemas";
+  type TeamMemberFormValues,
+} from "@/entities/team-member";
+import { userQueries } from "@/entities/user";
 
 // --- Queries -----------------------------------------------------------------
 export function useCompanies(params: CompanyListParams) {
@@ -43,11 +38,23 @@ export function useMembers(params: MemberListParams) {
 }
 
 export function useProjects(companyId: string) {
-  return useQuery(projectListOptions(companyId));
+  return useQuery(projectQueries.list(companyId));
 }
 
 export function useTeams(projectId: string) {
-  return useQuery(teamListOptions(projectId));
+  return useQuery(teamQueries.list(projectId));
+}
+
+export function useTeamMembers(teamId: string) {
+  return useQuery(teamMemberQueries.list(teamId));
+}
+
+export function useProjectMembers(projectId: string) {
+  return useQuery(projectMemberQueries.list(projectId));
+}
+
+export function useUserLookup(search: string) {
+  return useQuery(userQueries.lookup(search));
 }
 
 // --- Company mutations -------------------------------------------------------
@@ -78,11 +85,7 @@ export function useUpdateCompany() {
   });
 }
 
-// --- Member mutations --------------------------------------------------------
-export function useUserLookup(search: string) {
-  return useQuery(userLookupOptions(search));
-}
-
+// --- Company-member mutations ------------------------------------------------
 export function useCreateMember(companyId: string) {
   const qc = useQueryClient();
   const t = useTranslations("organization");
@@ -131,39 +134,38 @@ export function useCreateProject(companyId: string) {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (input: ProjectFormValues) =>
-      organizationApi.createProject(companyId, input),
+    mutationFn: (input: ProjectFormValues) => projectApi.create(companyId, input),
     onSuccess: () => {
       toast.success(t("toasts.projectCreated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.projects(companyId) });
+      qc.invalidateQueries({ queryKey: projectQueries.all() });
       qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useUpdateProject(companyId: string) {
+export function useUpdateProject() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Partial<ProjectFormValues> }) =>
-      organizationApi.updateProject(id, input),
+      projectApi.update(id, input),
     onSuccess: () => {
       toast.success(t("toasts.projectUpdated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.projects(companyId) });
+      qc.invalidateQueries({ queryKey: projectQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useDeleteProject(companyId: string) {
+export function useDeleteProject() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (id: string) => organizationApi.removeProject(id),
+    mutationFn: (id: string) => projectApi.remove(id),
     onSuccess: () => {
       toast.success(t("toasts.projectDeleted"));
-      qc.invalidateQueries({ queryKey: organizationKeys.projects(companyId) });
+      qc.invalidateQueries({ queryKey: projectQueries.all() });
       qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
@@ -175,118 +177,110 @@ export function useCreateTeam(projectId: string) {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (input: TeamFormValues) =>
-      organizationApi.createTeam(projectId, input),
+    mutationFn: (input: TeamFormValues) => teamApi.create(projectId, input),
     onSuccess: () => {
       toast.success(t("toasts.teamCreated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teams(projectId) });
+      qc.invalidateQueries({ queryKey: teamQueries.all() });
+      qc.invalidateQueries({ queryKey: projectQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useUpdateTeam(projectId: string) {
+export function useUpdateTeam() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) =>
-      organizationApi.updateTeam(id, { name }),
+      teamApi.update(id, { name }),
     onSuccess: () => {
       toast.success(t("toasts.teamUpdated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teams(projectId) });
+      qc.invalidateQueries({ queryKey: teamQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useDeleteTeam(projectId: string) {
+export function useDeleteTeam() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (id: string) => organizationApi.removeTeam(id),
+    mutationFn: (id: string) => teamApi.remove(id),
     onSuccess: () => {
       toast.success(t("toasts.teamDeleted"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teams(projectId) });
+      qc.invalidateQueries({ queryKey: teamQueries.all() });
+      qc.invalidateQueries({ queryKey: projectQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-// --- Team member (TVGS / Nhà Thầu / Thí Nghiệm) ------------------------------
-export function useTeamMembers(teamId: string) {
-  return useQuery(teamMemberListOptions(teamId));
-}
-
+// --- Team-member mutations ---------------------------------------------------
 export function useCreateTeamMember(teamId: string) {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (input: TeamMemberCreateInput) =>
-      organizationApi.createTeamMember(teamId, input),
+    mutationFn: (input: TeamMemberCreateInput) => teamMemberApi.create(teamId, input),
     onSuccess: () => {
       toast.success(t("toasts.teamMemberAdded"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teamMembers(teamId) });
-      qc.invalidateQueries({ queryKey: organizationKeys.all });
+      qc.invalidateQueries({ queryKey: teamMemberQueries.all() });
+      qc.invalidateQueries({ queryKey: teamQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useUpdateTeamMember(teamId: string) {
+export function useUpdateTeamMember() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Partial<TeamMemberFormValues> }) =>
-      organizationApi.updateTeamMember(id, input),
+      teamMemberApi.update(id, input),
     onSuccess: () => {
       toast.success(t("toasts.teamMemberUpdated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teamMembers(teamId) });
+      qc.invalidateQueries({ queryKey: teamMemberQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useDeleteTeamMember(teamId: string) {
+export function useDeleteTeamMember() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (id: string) => organizationApi.removeTeamMember(id),
+    mutationFn: (id: string) => teamMemberApi.remove(id),
     onSuccess: () => {
       toast.success(t("toasts.teamMemberRemoved"));
-      qc.invalidateQueries({ queryKey: organizationKeys.teamMembers(teamId) });
-      qc.invalidateQueries({ queryKey: organizationKeys.all });
+      qc.invalidateQueries({ queryKey: teamMemberQueries.all() });
+      qc.invalidateQueries({ queryKey: teamQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-// --- Project member (internal, chủ đầu tư side) ------------------------------
-export function useProjectMembers(projectId: string) {
-  return useQuery(projectMemberListOptions(projectId));
-}
-
+// --- Project-member mutations ------------------------------------------------
 export function useCreateProjectMember(projectId: string) {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
     mutationFn: (companyMemberId: string) =>
-      organizationApi.createProjectMember(projectId, companyMemberId),
+      projectMemberApi.create(projectId, companyMemberId),
     onSuccess: () => {
       toast.success(t("toasts.projectMemberAdded"));
-      qc.invalidateQueries({ queryKey: organizationKeys.projectMembers(projectId) });
+      qc.invalidateQueries({ queryKey: projectMemberQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
 }
 
-export function useDeleteProjectMember(projectId: string) {
+export function useDeleteProjectMember() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (id: string) => organizationApi.removeProjectMember(id),
+    mutationFn: (id: string) => projectMemberApi.remove(id),
     onSuccess: () => {
       toast.success(t("toasts.projectMemberRemoved"));
-      qc.invalidateQueries({ queryKey: organizationKeys.projectMembers(projectId) });
+      qc.invalidateQueries({ queryKey: projectMemberQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });

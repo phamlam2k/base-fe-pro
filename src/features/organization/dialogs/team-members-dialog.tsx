@@ -17,7 +17,7 @@ import {
 import { Skeleton } from "@/shared/ui/skeleton";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/shared/ui/permission-gate";
-import { TeamTypeBadge } from "@/features/organization/components/badges";
+import { TeamTypeBadge } from "@/entities/team";
 import { TeamMemberFormDialog } from "@/features/organization/dialogs/team-member-form-dialog";
 import {
   useDeleteTeamMember,
@@ -43,7 +43,7 @@ export function TeamMembersDialog({
   const format = useFormatter();
   const teamId = team?.id ?? "";
   const membersQuery = useTeamMembers(teamId);
-  const deleteMember = useDeleteTeamMember(teamId);
+  const deleteMember = useDeleteTeamMember();
 
   const [addOpen, setAddOpen] = React.useState(false);
   const [toRemove, setToRemove] = React.useState<TeamMember | null>(null);

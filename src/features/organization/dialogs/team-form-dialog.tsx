@@ -61,7 +61,7 @@ export function TeamFormDialog({
   const t = useTranslations("organization");
   const tCommon = useTranslations("common");
   const createTeam = useCreateTeam(projectId);
-  const updateTeam = useUpdateTeam(projectId);
+  const updateTeam = useUpdateTeam();
   const isEdit = Boolean(team);
   const isPending = createTeam.isPending || updateTeam.isPending;
 
