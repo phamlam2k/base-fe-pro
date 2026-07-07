@@ -35,7 +35,8 @@ import { projectQueries } from "@/entities/project";
 import { teamQueries } from "@/entities/team";
 import { useDeleteProject } from "@/features/manage-project";
 import { useDeleteTeam } from "@/features/manage-team";
-import { TEAM_TYPES, type Project, type Team, type TeamType } from "@/features/organization/types";
+import { TEAM_TYPES, type Team, type TeamType } from "@/entities/team";
+import type { Project } from "@/entities/project";
 
 type ProjectDialog = { mode: "create" } | { mode: "edit"; project: Project } | null;
 

@@ -26,7 +26,7 @@ import { RoleLegend } from "./role-legend";
 import { StructurePanel } from "./structure-panel";
 import { useQuery } from "@tanstack/react-query";
 import { companyQueries } from "@/entities/company";
-import type { Company } from "@/features/organization/types";
+import type { Company } from "@/entities/company";
 
 /**
  * Access-management console. A company picker scopes the "Members" and

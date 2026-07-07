@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 
 import { apiClient } from "@/shared/api/axios";
 import type { Role } from "@/shared/config/permissions";
-import type { User } from "@/features/users";
+import type { User } from "@/entities/user";
 import type { ApiResponse } from "@/shared/api/types";
 
 export interface DashboardData {

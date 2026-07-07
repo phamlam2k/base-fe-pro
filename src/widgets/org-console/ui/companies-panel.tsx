@@ -27,7 +27,7 @@ import { CompanyFormDialog } from "@/features/manage-company";
 import { useQuery } from "@tanstack/react-query";
 import { companyQueries } from "@/entities/company";
 import { useUpdateCompany } from "@/features/manage-company";
-import type { Company, CompanyListParams } from "@/features/organization/types";
+import type { Company, CompanyListParams } from "@/entities/company";
 
 export function CompaniesPanel() {
   const t = useTranslations("organization");

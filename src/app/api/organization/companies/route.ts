@@ -7,8 +7,8 @@ import {
   toPaginated,
 } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import { companyListQuerySchema } from "@/features/organization/schemas";
-import type { Company } from "@/features/organization/types";
+import { companyListQuerySchema } from "@/entities/company";
+import type { Company } from "@/entities/company";
 import type { Paginated } from "@/shared/api/types";
 
 const ORDER_FIELD: Record<string, string> = {

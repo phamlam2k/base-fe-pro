@@ -16,11 +16,10 @@ import {
 } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { PermissionGate } from "@/entities/session";
-// CROSS-FEATURE REFERENCE EXAMPLE (docs/ARCHITECTURE.md §9):
-// dashboard (composite) uses the `users` core feature — ONLY via its public
-// API. Deep imports like "@/features/users/components/..." are an ESLint error.
+// FSD layering: this widget composes the `manage-user` feature (create dialog)
+// and the `user` entity (model), each via its public API — imports flow down.
 import { UserFormDialog } from "@/features/manage-user";
-import type { User } from "@/features/users";
+import type { User } from "@/entities/user";
 import { dashboardKeys } from "@/widgets/dashboard-overview/api/dashboard.api";
 
 function initialsOf(name: string): string {

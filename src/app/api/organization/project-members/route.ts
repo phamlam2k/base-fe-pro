@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { backendErrorMessage, callBackend, toArray } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import type { ProjectMember } from "@/features/organization/types";
+import type { ProjectMember } from "@/entities/project-member";
 
 interface RawProjectMember {
   id: string;

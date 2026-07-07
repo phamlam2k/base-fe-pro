@@ -7,8 +7,8 @@ import {
   toPaginated,
 } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import { memberListQuerySchema } from "@/features/organization/schemas";
-import type { Member } from "@/features/organization/types";
+import { memberListQuerySchema } from "@/entities/company-member";
+import type { Member } from "@/entities/company-member";
 import type { Paginated } from "@/shared/api/types";
 
 /** Django CompanyMember (camelized) → the console's flat Member shape. */

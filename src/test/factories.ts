@@ -1,5 +1,5 @@
 import type { SessionUser } from "@/entities/session";
-import type { User } from "@/features/users";
+import type { User } from "@/entities/user";
 import type { Paginated } from "@/shared/api/types";
 
 /**

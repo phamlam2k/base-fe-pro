@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { backendErrorMessage, callBackend } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import type { Company } from "@/features/organization/types";
+import type { Company } from "@/entities/company";
 
 type RouteParams = { params: Promise<{ id: string }> };
 

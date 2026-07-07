@@ -7,8 +7,8 @@ import {
   toPaginated,
 } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import { userListQuerySchema } from "@/features/users/schemas";
-import type { User } from "@/features/users/types";
+import { userListQuerySchema } from "@/entities/user";
+import type { User } from "@/entities/user";
 import type { Paginated } from "@/shared/api/types";
 
 /** Django user (camelized) → the console's User shape. */

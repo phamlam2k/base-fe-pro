@@ -16,7 +16,7 @@ import { DataTableColumnHeader } from "@/shared/ui/data-table/data-table-column-
 import { PermissionGate } from "@/entities/session";
 import { usePermission } from "@/entities/session";
 import { MemberRoleBadge } from "@/entities/company-member";
-import type { Member } from "@/features/organization/types";
+import type { Member } from "@/entities/company-member";
 
 function initialsOf(name: string): string {
   return name

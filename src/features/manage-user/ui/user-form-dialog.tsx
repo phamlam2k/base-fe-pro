@@ -30,7 +30,7 @@ import { useCreateUser, useUpdateUser } from "@/features/manage-user/model/hooks
 import {
   createUserFormSchema,
   type UserFormValues,
-} from "@/features/users/schemas";
+} from "@/entities/user";
 import type { User } from "@/entities/user";
 
 /**

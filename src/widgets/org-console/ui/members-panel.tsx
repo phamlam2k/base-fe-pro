@@ -28,7 +28,7 @@ import {
   type Member,
   type MemberListParams,
   type OrgRole,
-} from "@/features/organization/types";
+} from "@/entities/company-member";
 
 type DialogState = { mode: "create" } | { mode: "edit"; member: Member } | null;
 

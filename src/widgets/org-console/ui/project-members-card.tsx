@@ -21,7 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { companyMemberQueries } from "@/entities/company-member";
 import { projectMemberQueries } from "@/entities/project-member";
 import { useCreateProjectMember, useDeleteProjectMember } from "@/features/manage-project-member";
-import type { ProjectMember } from "@/features/organization/types";
+import type { ProjectMember } from "@/entities/project-member";
 
 /**
  * Internal project members (chủ đầu tư side): assign existing company members
