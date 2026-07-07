@@ -19,8 +19,8 @@ import {
 } from "@/shared/ui/popover";
 import { useDebounce } from "@/shared/lib/use-debounce";
 import { cn } from "@/shared/lib/utils";
-import { useUserLookup } from "@/features/organization/hooks";
-import type { UserOption } from "@/features/organization/types";
+import { useUserLookup } from "@/features/pick-user/model/use-user-lookup";
+import type { UserOption } from "@/entities/user";
 
 /**
  * Search-and-pick an EXISTING user account (id/name/email). Replaces raw email

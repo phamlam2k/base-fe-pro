@@ -26,12 +26,12 @@ import {
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Switch } from "@/shared/ui/switch";
-import { useCreateUser, useUpdateUser } from "@/features/users/hooks";
+import { useCreateUser, useUpdateUser } from "@/features/manage-user/model/hooks";
 import {
   createUserFormSchema,
   type UserFormValues,
 } from "@/features/users/schemas";
-import type { User } from "@/features/users/types";
+import type { User } from "@/entities/user";
 
 /**
  * Create + edit a platform user in one dialog. `user` present → edit mode

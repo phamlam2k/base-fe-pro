@@ -18,15 +18,16 @@ import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table/data-table";
 import { PermissionGate } from "@/entities/session";
 import { useDebounce } from "@/shared/lib/use-debounce";
+import { useQuery } from "@tanstack/react-query";
 import { getUserColumns } from "@/features/users/components/user-columns";
-import { UserFormDialog } from "@/features/users/components/user-form-dialog";
-import { useDeleteUser, useUsers } from "@/features/users/hooks";
+import { UserFormDialog, useDeleteUser } from "@/features/manage-user";
 import {
   SUPER_ADMIN_FILTERS,
   type SuperAdminFilter,
   type User,
   type UserListParams,
 } from "@/features/users/types";
+import { userQueries } from "@/entities/user";
 
 type DialogState = { mode: "create" } | { mode: "edit"; user: User } | null;
 
@@ -57,7 +58,7 @@ export function UsersView() {
     sortOrder: sorting[0]?.desc === false ? "asc" : "desc",
   };
 
-  const usersQuery = useUsers(params);
+  const usersQuery = useQuery(userQueries.list(params));
   const deleteUser = useDeleteUser();
 
   const [dialog, setDialog] = React.useState<DialogState>(null);

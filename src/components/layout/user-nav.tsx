@@ -17,7 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { ROUTES } from "@/shared/config/routes";
-import { useLogout } from "@/features/auth";
+import { useLogout } from "@/features/auth-by-credentials";
 import { useSession } from "@/entities/session";
 
 function initialsOf(name: string): string {

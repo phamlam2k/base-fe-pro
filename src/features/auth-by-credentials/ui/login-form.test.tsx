@@ -2,7 +2,7 @@ import { HttpResponse, http } from "msw";
 import { describe, expect, it } from "vitest";
 
 import { ROUTES } from "@/shared/config/routes";
-import { LoginForm } from "@/features/auth/components/login-form";
+import { LoginForm } from "@/features/auth-by-credentials/ui/login-form";
 import { mockRouter } from "@/test/mocks/navigation";
 import { server } from "@/test/msw/server";
 import { renderWithProviders, screen, waitFor } from "@/test/test-utils";

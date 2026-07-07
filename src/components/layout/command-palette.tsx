@@ -18,7 +18,7 @@ import {
 } from "@/shared/ui/command";
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { setUserLocale } from "@/shared/config/i18n/actions";
-import { useLogout } from "@/features/auth";
+import { useLogout } from "@/features/auth-by-credentials";
 import { usePermission } from "@/entities/session";
 
 /**

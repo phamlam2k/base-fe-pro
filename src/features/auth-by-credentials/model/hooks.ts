@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { ROUTES } from "@/shared/config/routes";
-import { authApi } from "@/features/auth/api";
-import type { LoginValues } from "@/features/auth/schemas";
+import { authApi } from "@/features/auth-by-credentials/api/auth.api";
+import type { LoginValues } from "@/features/auth-by-credentials/model/schemas";
 
 export function useLogin(redirectTo?: string) {
   const router = useRouter();

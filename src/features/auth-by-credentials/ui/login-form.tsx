@@ -26,8 +26,8 @@ import {
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { isApiError } from "@/shared/api/axios";
-import { useLogin } from "@/features/auth/hooks";
-import { createLoginSchema, type LoginValues } from "@/features/auth/schemas";
+import { useLogin } from "@/features/auth-by-credentials/model/hooks";
+import { createLoginSchema, type LoginValues } from "@/features/auth-by-credentials/model/schemas";
 
 const DEMO_ACCOUNTS = [
   { email: "admin@acme.io", role: "Admin" },

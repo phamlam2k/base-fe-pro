@@ -19,7 +19,8 @@ import { PermissionGate } from "@/entities/session";
 // CROSS-FEATURE REFERENCE EXAMPLE (docs/ARCHITECTURE.md §9):
 // dashboard (composite) uses the `users` core feature — ONLY via its public
 // API. Deep imports like "@/features/users/components/..." are an ESLint error.
-import { UserFormDialog, type User } from "@/features/users";
+import { UserFormDialog } from "@/features/manage-user";
+import type { User } from "@/features/users";
 import { dashboardKeys } from "@/features/dashboard/api";
 
 function initialsOf(name: string): string {

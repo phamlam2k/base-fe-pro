@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { UserPicker } from "@/features/organization/components/user-picker";
+import { UserPicker } from "@/features/pick-user";
 import { useCreateTeamMember } from "@/features/organization/hooks";
 import {
   createTeamMemberFormSchema,

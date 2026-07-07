@@ -1,19 +1,10 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import {
-  userApi,
-  userQueries,
-  type UserFormValues,
-  type UserListParams,
-} from "@/entities/user";
-
-export function useUsers(params: UserListParams) {
-  return useQuery(userQueries.list(params));
-}
+import { userApi, userQueries, type UserFormValues } from "@/entities/user";
 
 export function useCreateUser() {
   const queryClient = useQueryClient();

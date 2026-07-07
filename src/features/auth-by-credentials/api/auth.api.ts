@@ -1,7 +1,7 @@
 import { apiClient } from "@/shared/api/axios";
 import type { SessionUser } from "@/entities/session";
 import type { ApiResponse } from "@/shared/api/types";
-import type { LoginValues } from "@/features/auth/schemas";
+import type { LoginValues } from "@/features/auth-by-credentials/model/schemas";
 
 export const authApi = {
   async login(input: LoginValues): Promise<SessionUser> {
