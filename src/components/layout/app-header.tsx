@@ -3,15 +3,15 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
-import { Separator } from "@/components/ui/separator";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/shared/ui/separator";
+import { SidebarTrigger } from "@/shared/ui/sidebar";
 import { CommandPalette } from "@/components/layout/command-palette";
 import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { ThemeCustomizerPopover } from "@/components/layout/theme-customizer";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { UserNav } from "@/components/layout/user-nav";
-import { FeatureGate } from "@/components/shared/feature-gate";
-import { NAV_GROUPS } from "@/config/nav";
+import { FeatureGate } from "@/shared/ui/feature-gate";
+import { NAV_GROUPS } from "@/shared/config/nav";
 import { NotificationsBell } from "@/features/notifications";
 
 export function AppHeader() {

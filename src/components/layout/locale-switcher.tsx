@@ -5,15 +5,15 @@ import { Check, Languages } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { LOCALES, LOCALE_LABELS, type Locale } from "@/i18n/config";
-import { setUserLocale } from "@/i18n/actions";
+} from "@/shared/ui/dropdown-menu";
+import { LOCALES, LOCALE_LABELS, type Locale } from "@/shared/config/i18n/config";
+import { setUserLocale } from "@/shared/config/i18n/actions";
 
 export function LocaleSwitcher() {
   const locale = useLocale();

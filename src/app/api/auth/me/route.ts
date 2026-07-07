@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { jsonData, requireAuth } from "@/lib/api/server";
+import { jsonData, requireAuth } from "@/shared/api/server";
 
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request);

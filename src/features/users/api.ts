@@ -1,7 +1,7 @@
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 
-import { apiClient } from "@/lib/api/axios";
-import type { ApiResponse, Paginated } from "@/types/api";
+import { apiClient } from "@/shared/api/axios";
+import type { ApiResponse, Paginated } from "@/shared/api/types";
 import type { UserFormValues } from "@/features/users/schemas";
 import type { User, UserListParams } from "@/features/users/types";
 

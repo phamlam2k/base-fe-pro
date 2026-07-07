@@ -5,39 +5,32 @@ import { Plus, Search } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { PaginationState, SortingState } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ConfirmDialog } from "@/components/shared/confirm-dialog";
-import { DataTable } from "@/components/shared/data-table/data-table";
-import { PermissionGate } from "@/components/shared/permission-gate";
-import { ROLES, type Role } from "@/config/permissions";
-import { useDebounce } from "@/hooks/use-debounce";
+} from "@/shared/ui/select";
+import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
+import { DataTable } from "@/shared/ui/data-table/data-table";
+import { PermissionGate } from "@/shared/ui/permission-gate";
+import { useDebounce } from "@/shared/lib/use-debounce";
 import { getUserColumns } from "@/features/users/components/user-columns";
 import { UserFormDialog } from "@/features/users/components/user-form-dialog";
 import { useDeleteUser, useUsers } from "@/features/users/hooks";
 import {
-  USER_STATUSES,
+  SUPER_ADMIN_FILTERS,
+  type SuperAdminFilter,
   type User,
   type UserListParams,
-  type UserStatus,
 } from "@/features/users/types";
 
-type DialogState =
-  | { mode: "create" }
-  | { mode: "edit"; user: User }
-  | null;
+type DialogState = { mode: "create" } | { mode: "edit"; user: User } | null;
 
-/**
- * Container component owning all list state (filters, pagination, sorting)
- * and orchestrating the dialogs. The page file just renders this.
- */
+/** Platform user management (SuperAdmin). Backed by the Django user API. */
 export function UsersView() {
   const t = useTranslations("users");
 
@@ -49,11 +42,9 @@ export function UsersView() {
     { id: "createdAt", desc: true },
   ]);
   const [search, setSearch] = React.useState("");
-  const [role, setRole] = React.useState<Role | "all">("all");
-  const [status, setStatus] = React.useState<UserStatus | "all">("all");
+  const [superAdmin, setSuperAdmin] = React.useState<SuperAdminFilter>("all");
 
   const debouncedSearch = useDebounce(search);
-
   const resetToFirstPage = () =>
     setPagination((previous) => ({ ...previous, pageIndex: 0 }));
 
@@ -61,8 +52,7 @@ export function UsersView() {
     page: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     search: debouncedSearch || undefined,
-    role,
-    status,
+    superAdmin,
     sortBy: (sorting[0]?.id as UserListParams["sortBy"]) ?? "createdAt",
     sortOrder: sorting[0]?.desc === false ? "asc" : "desc",
   };
@@ -100,50 +90,26 @@ export function UsersView() {
         </div>
 
         <Select
-          value={role}
+          value={superAdmin}
           onValueChange={(value) => {
-            setRole(value as Role | "all");
+            setSuperAdmin(value as SuperAdminFilter);
             resetToFirstPage();
           }}
         >
-          <SelectTrigger className="w-36">
+          <SelectTrigger className="w-48">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("allRoles")}</SelectItem>
-            {ROLES.map((candidate) => (
+            {SUPER_ADMIN_FILTERS.map((candidate) => (
               <SelectItem key={candidate} value={candidate}>
-                {t(`roles.${candidate}`)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        <Select
-          value={status}
-          onValueChange={(value) => {
-            setStatus(value as UserStatus | "all");
-            resetToFirstPage();
-          }}
-        >
-          <SelectTrigger className="w-36">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t("allStatuses")}</SelectItem>
-            {USER_STATUSES.map((candidate) => (
-              <SelectItem key={candidate} value={candidate}>
-                {t(`statuses.${candidate}`)}
+                {t(`filter.${candidate}`)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
 
         <PermissionGate permission="users:create">
-          <Button
-            className="ml-auto"
-            onClick={() => setDialog({ mode: "create" })}
-          >
+          <Button className="ml-auto" onClick={() => setDialog({ mode: "create" })}>
             <Plus />
             {t("addUser")}
           </Button>
@@ -170,7 +136,7 @@ export function UsersView() {
       <ConfirmDialog
         open={userToDelete !== null}
         onOpenChange={(open) => !open && setUserToDelete(null)}
-        title={t("deleteConfirmTitle", { name: userToDelete?.name ?? "" })}
+        title={t("deleteConfirmTitle", { name: userToDelete?.name || userToDelete?.email || "" })}
         description={t("deleteConfirmDescription")}
         isPending={deleteUser.isPending}
         onConfirm={() => {

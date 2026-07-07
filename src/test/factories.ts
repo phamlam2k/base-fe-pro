@@ -1,8 +1,6 @@
 import type { SessionUser } from "@/providers/session-provider";
-import type { Order } from "@/features/orders";
-import type { Product } from "@/features/products";
 import type { User } from "@/features/users";
-import type { Paginated } from "@/types/api";
+import type { Paginated } from "@/shared/api/types";
 
 /**
  * Test-data factories: every test builds ONLY the fields it cares about and
@@ -28,40 +26,10 @@ export function buildUser(overrides: Partial<User> = {}): User {
     id: nextId("usr"),
     name: "Jane Cooper",
     email: "jane.cooper@example.com",
-    role: "viewer",
-    status: "active",
+    phone: "",
+    isSuperAdmin: false,
+    isActive: true,
     createdAt: "2026-01-15T00:00:00.000Z",
-    ...overrides,
-  };
-}
-
-export function buildProduct(overrides: Partial<Product> = {}): Product {
-  return {
-    id: nextId("prd"),
-    name: "Aurora Headphones",
-    sku: `SKU-${String(++sequence).padStart(3, "0")}`,
-    category: "electronics",
-    price: 129.99,
-    stock: 42,
-    status: "active",
-    createdAt: "2026-02-01T00:00:00.000Z",
-    ...overrides,
-  };
-}
-
-export function buildOrder(overrides: Partial<Order> = {}): Order {
-  return {
-    id: nextId("ord"),
-    code: `SO-${2600 + sequence}`,
-    customerName: "Emma Johnson",
-    customerEmail: "emma.johnson@example.com",
-    status: "pending",
-    total: 214.5,
-    items: [
-      { id: "itm_1", productName: "Aurora Headphones", quantity: 1, unitPrice: 214.5 },
-    ],
-    timeline: [{ status: "pending", at: "2026-02-01T00:00:00.000Z", by: "system" }],
-    createdAt: "2026-02-01T00:00:00.000Z",
     ...overrides,
   };
 }

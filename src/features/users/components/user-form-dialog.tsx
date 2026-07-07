@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@/shared/ui/dialog";
 import {
   Form,
   FormControl,
@@ -23,26 +23,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ROLES } from "@/config/permissions";
+} from "@/shared/ui/form";
+import { Input } from "@/shared/ui/input";
+import { Switch } from "@/shared/ui/switch";
 import { useCreateUser, useUpdateUser } from "@/features/users/hooks";
 import {
   createUserFormSchema,
   type UserFormValues,
 } from "@/features/users/schemas";
-import { USER_STATUSES, type User } from "@/features/users/types";
+import type { User } from "@/features/users/types";
 
 /**
- * Create + edit in one dialog: `user` present → edit mode.
- * The inner form remounts via `key` so defaultValues reset cleanly.
+ * Create + edit a platform user in one dialog. `user` present → edit mode
+ * (email locked, password optional). The inner form remounts via `key`.
  */
 export function UserFormDialog({
   open,
@@ -54,7 +47,6 @@ export function UserFormDialog({
   user?: User | null;
 }) {
   const t = useTranslations("users");
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -72,18 +64,13 @@ export function UserFormDialog({
   );
 }
 
-function UserForm({
-  user,
-  onDone,
-}: {
-  user?: User | null;
-  onDone: () => void;
-}) {
+function UserForm({ user, onDone }: { user?: User | null; onDone: () => void }) {
   const t = useTranslations("users");
   const tCommon = useTranslations("common");
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
   const isPending = createUser.isPending || updateUser.isPending;
+  const isEdit = Boolean(user);
 
   const schema = React.useMemo(() => createUserFormSchema(t), [t]);
   const form = useForm<UserFormValues>({
@@ -91,26 +78,28 @@ function UserForm({
     defaultValues: {
       name: user?.name ?? "",
       email: user?.email ?? "",
-      role: user?.role ?? "viewer",
-      status: user?.status ?? "invited",
+      phone: user?.phone ?? "",
+      isSuperAdmin: user?.isSuperAdmin ?? false,
+      isActive: user?.isActive ?? true,
+      password: "",
     },
   });
 
   function onSubmit(values: UserFormValues) {
+    // Drop a blank password so an edit keeps the current one.
+    const payload = { ...values };
+    if (!payload.password) delete payload.password;
+
     if (user) {
-      updateUser.mutate({ id: user.id, input: values }, { onSuccess: onDone });
+      updateUser.mutate({ id: user.id, input: payload }, { onSuccess: onDone });
     } else {
-      createUser.mutate(values, { onSuccess: onDone });
+      createUser.mutate(payload, { onSuccess: onDone });
     }
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid gap-4"
-        noValidate
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4" noValidate>
         <FormField
           control={form.control}
           name="name"
@@ -131,71 +120,80 @@ function UserForm({
             <FormItem>
               <FormLabel>{t("email")}</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="user@company.com" {...field} />
+                <Input
+                  type="email"
+                  placeholder="user@company.vn"
+                  disabled={isEdit}
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="role"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("role")}</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {ROLES.map((role) => (
-                      <SelectItem key={role} value={role}>
-                        {t(`roles.${role}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>{t("status")}</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {USER_STATUSES.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {t(`statuses.${status}`)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormDescription>{t("roleDescription")}</FormDescription>
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("phone")}</FormLabel>
+              <FormControl>
+                <Input placeholder="09xx xxx xxx" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>{t("password")}</FormLabel>
+              <FormControl>
+                <Input type="password" placeholder="••••••••" {...field} />
+              </FormControl>
+              <FormDescription>
+                {isEdit ? t("passwordEditHint") : t("passwordCreateHint")}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="isSuperAdmin"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-lg border p-3">
+              <div className="grid gap-0.5">
+                <FormLabel>{t("superAdmin")}</FormLabel>
+                <FormDescription>{t("superAdminHint")}</FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="isActive"
+          render={({ field }) => (
+            <FormItem className="flex items-center justify-between rounded-lg border p-3">
+              <div className="grid gap-0.5">
+                <FormLabel>{t("activeAccount")}</FormLabel>
+                <FormDescription>{t("activeHint")}</FormDescription>
+              </div>
+              <FormControl>
+                <Switch checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl>
+            </FormItem>
+          )}
+        />
 
         <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onDone}
-            disabled={isPending}
-          >
+          <Button type="button" variant="outline" onClick={onDone} disabled={isPending}>
             {tCommon("cancel")}
           </Button>
           <Button type="submit" disabled={isPending}>

@@ -1,6 +1,6 @@
-import { apiClient } from "@/lib/api/axios";
+import { apiClient } from "@/shared/api/axios";
 import type { SessionUser } from "@/providers/session-provider";
-import type { ApiResponse } from "@/types/api";
+import type { ApiResponse } from "@/shared/api/types";
 import type { LoginValues } from "@/features/auth/schemas";
 
 export const authApi = {

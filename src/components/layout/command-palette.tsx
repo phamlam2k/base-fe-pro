@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -15,9 +15,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command";
-import { NAV_GROUPS } from "@/config/nav";
-import { setUserLocale } from "@/i18n/actions";
+} from "@/shared/ui/command";
+import { NAV_GROUPS } from "@/shared/config/nav";
+import { setUserLocale } from "@/shared/config/i18n/actions";
 import { useLogout } from "@/features/auth";
 import { usePermission } from "@/providers/session-provider";
 

@@ -4,7 +4,7 @@ import * as React from "react";
 import { TriangleAlert } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 
 /** Segment error boundary: keeps the shell alive, offers a retry. */
 export default function DashboardError({

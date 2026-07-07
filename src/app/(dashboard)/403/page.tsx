@@ -3,8 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { Button } from "@/components/ui/button";
-import { ROUTES } from "@/config/routes";
+import { Button } from "@/shared/ui/button";
+import { ROUTES } from "@/shared/config/routes";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("auth");

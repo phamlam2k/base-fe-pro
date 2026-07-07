@@ -21,11 +21,11 @@ export default defineConfig({
       reporter: ["text", "html", "lcov"],
       include: ["src/**"],
       exclude: [
-        "src/components/ui/**", // generated shadcn components
+        "src/shared/ui/**",     // generated shadcn components
         "src/app/**",           // thin route files — covered by E2E
         "src/mocks/**",         // mock API data
         "src/test/**",
-        "src/messages/**",
+        "src/shared/config/i18n/messages/**",
         "src/**/*.test.{ts,tsx}",
       ],
     },

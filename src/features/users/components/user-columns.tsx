@@ -1,48 +1,53 @@
 "use client";
 
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, ShieldCheck, Trash2 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useFormatter, useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DataTableColumnHeader } from "@/components/shared/data-table/data-table-column-header";
-import { PermissionGate } from "@/components/shared/permission-gate";
+} from "@/shared/ui/dropdown-menu";
+import { DataTableColumnHeader } from "@/shared/ui/data-table/data-table-column-header";
+import { PermissionGate } from "@/shared/ui/permission-gate";
 import { usePermission } from "@/providers/session-provider";
-import { cn } from "@/lib/utils";
-import type { User, UserStatus } from "@/features/users/types";
+import { cn } from "@/shared/lib/utils";
+import type { User } from "@/features/users/types";
 
-const STATUS_STYLES: Record<UserStatus, string> = {
-  active: "bg-emerald-500",
-  invited: "bg-amber-500",
-  suspended: "bg-red-500",
-};
+function RoleBadge({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+  const t = useTranslations("users");
+  if (isSuperAdmin) {
+    return (
+      <Badge className="gap-1">
+        <ShieldCheck className="size-3.5" />
+        {t("superAdmin")}
+      </Badge>
+    );
+  }
+  return <Badge variant="outline">{t("normalUser")}</Badge>;
+}
 
-function StatusBadge({ status }: { status: UserStatus }) {
+function ActiveBadge({ isActive }: { isActive: boolean }) {
   const t = useTranslations("users");
   return (
     <Badge variant="outline" className="gap-1.5">
-      <span className={cn("size-1.5 rounded-full", STATUS_STYLES[status])} />
-      {t(`statuses.${status}`)}
+      <span
+        className={cn(
+          "size-1.5 rounded-full",
+          isActive ? "bg-emerald-500" : "bg-red-500",
+        )}
+      />
+      {t(isActive ? "active" : "inactive")}
     </Badge>
   );
 }
 
-function RoleBadge({ role }: { role: User["role"] }) {
-  const t = useTranslations("users");
-  const variant =
-    role === "admin" ? "default" : role === "manager" ? "secondary" : "outline";
-  return <Badge variant={variant}>{t(`roles.${role}`)}</Badge>;
-}
-
-function CreatedAtCell({ value }: { value: string }) {
+function JoinedCell({ value }: { value: string }) {
   const format = useFormatter();
   return (
     <span className="text-muted-foreground">
@@ -63,8 +68,6 @@ function RowActions({
   const t = useTranslations("common");
   const tUsers = useTranslations("users");
   const { canAny } = usePermission();
-
-  // No visible actions for this role — render nothing instead of an empty menu.
   if (!canAny(["users:update", "users:delete"])) return null;
 
   return (
@@ -82,10 +85,7 @@ function RowActions({
           </DropdownMenuItem>
         </PermissionGate>
         <PermissionGate permission="users:delete">
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => onDelete(user)}
-          >
+          <DropdownMenuItem variant="destructive" onClick={() => onDelete(user)}>
             <Trash2 />
             {tUsers("deleteUser")}
           </DropdownMenuItem>
@@ -100,15 +100,11 @@ function initialsOf(name: string): string {
     .split(" ")
     .map((part) => part[0])
     .filter(Boolean)
-    .slice(0, 2)
+    .slice(-2)
     .join("")
     .toUpperCase();
 }
 
-/**
- * Column factory — receives the `users`-scoped translator and row callbacks
- * so the definitions stay serializable-free and testable.
- */
 export function getUserColumns({
   t,
   onEdit,
@@ -126,13 +122,15 @@ export function getUserColumns({
       ),
       cell: ({ row }) => (
         <div className="flex items-center gap-3">
-          <Avatar className="size-8">
+          <Avatar className="size-9">
             <AvatarFallback className="text-xs">
-              {initialsOf(row.original.name)}
+              {initialsOf(row.original.name || row.original.email)}
             </AvatarFallback>
           </Avatar>
           <div className="grid">
-            <span className="font-medium">{row.original.name}</span>
+            <span className="text-base font-medium">
+              {row.original.name || "—"}
+            </span>
             <span className="text-muted-foreground text-xs">
               {row.original.email}
             </span>
@@ -141,21 +139,30 @@ export function getUserColumns({
       ),
     },
     {
-      accessorKey: "role",
-      header: t("role"),
-      cell: ({ row }) => <RoleBadge role={row.original.role} />,
+      accessorKey: "phone",
+      header: t("phone"),
+      cell: ({ row }) => (
+        <span className={row.original.phone ? "" : "text-muted-foreground"}>
+          {row.original.phone || "—"}
+        </span>
+      ),
     },
     {
-      accessorKey: "status",
-      header: t("status"),
-      cell: ({ row }) => <StatusBadge status={row.original.status} />,
+      accessorKey: "isSuperAdmin",
+      header: t("roleColumn"),
+      cell: ({ row }) => <RoleBadge isSuperAdmin={row.original.isSuperAdmin} />,
+    },
+    {
+      accessorKey: "isActive",
+      header: t("statusColumn"),
+      cell: ({ row }) => <ActiveBadge isActive={row.original.isActive} />,
     },
     {
       accessorKey: "createdAt",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title={t("createdAt")} />
       ),
-      cell: ({ row }) => <CreatedAtCell value={row.original.createdAt} />,
+      cell: ({ row }) => <JoinedCell value={row.original.createdAt} />,
     },
     {
       id: "actions",

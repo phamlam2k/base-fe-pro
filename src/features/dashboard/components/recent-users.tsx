@@ -5,17 +5,17 @@ import { Pencil } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useFormatter, useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { PermissionGate } from "@/components/shared/permission-gate";
+} from "@/shared/ui/card";
+import { Skeleton } from "@/shared/ui/skeleton";
+import { PermissionGate } from "@/shared/ui/permission-gate";
 // CROSS-FEATURE REFERENCE EXAMPLE (docs/ARCHITECTURE.md §9):
 // dashboard (composite) uses the `users` core feature — ONLY via its public
 // API. Deep imports like "@/features/users/components/..." are an ESLint error.

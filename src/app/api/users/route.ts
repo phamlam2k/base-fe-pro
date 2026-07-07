@@ -1,19 +1,48 @@
 import type { NextRequest } from "next/server";
-import { z } from "zod";
 
-import { jsonData, jsonError, requireAuth } from "@/lib/api/server";
 import {
-  createUserFormSchema,
-  userListQuerySchema,
-} from "@/features/users/schemas";
-import { allocateUserId, getDb, simulateLatency, type DbUser } from "@/mocks/db";
-import type { Paginated } from "@/types/api";
+  backendErrorMessage,
+  callBackend,
+  drfOrdering,
+  toPaginated,
+} from "@/shared/api/backend";
+import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
+import { userListQuerySchema } from "@/features/users/schemas";
+import type { User } from "@/features/users/types";
+import type { Paginated } from "@/shared/api/types";
+
+/** Django user (camelized) → the console's User shape. */
+interface RawUser {
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string;
+  isActive: boolean;
+  isSuperAdmin: boolean;
+  dateJoined: string;
+}
+
+function toUser(raw: RawUser): User {
+  return {
+    id: raw.id,
+    name: raw.fullName ?? "",
+    email: raw.email,
+    phone: raw.phone ?? "",
+    isSuperAdmin: raw.isSuperAdmin,
+    isActive: raw.isActive,
+    createdAt: raw.dateJoined,
+  };
+}
+
+const ORDER_FIELD: Record<string, string> = {
+  name: "full_name",
+  email: "email",
+  createdAt: "date_joined",
+};
 
 export async function GET(request: NextRequest) {
   const auth = requireAuth(request, "users:view");
   if ("response" in auth) return auth.response;
-
-  await simulateLatency();
 
   const query = userListQuerySchema.safeParse(
     Object.fromEntries(request.nextUrl.searchParams),
@@ -21,44 +50,25 @@ export async function GET(request: NextRequest) {
   if (!query.success) {
     return jsonError(422, "VALIDATION_ERROR", "Invalid query parameters.");
   }
+  const { page, pageSize, search, superAdmin, sortBy, sortOrder } = query.data;
 
-  const { page, pageSize, search, role, status, sortBy, sortOrder } =
-    query.data;
-
-  let users = [...getDb().users];
-
-  if (search) {
-    const needle = search.toLowerCase();
-    users = users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(needle) ||
-        user.email.toLowerCase().includes(needle),
-    );
-  }
-  if (role && role !== "all") {
-    users = users.filter((user) => user.role === role);
-  }
-  if (status && status !== "all") {
-    users = users.filter((user) => user.status === status);
-  }
-
-  users.sort((a, b) => {
-    const left = a[sortBy];
-    const right = b[sortBy];
-    const compared = left.localeCompare(right);
-    return sortOrder === "asc" ? compared : -compared;
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(pageSize),
   });
+  if (search) params.set("search", search);
+  if (superAdmin === "yes") params.set("is_superuser", "true");
+  if (superAdmin === "no") params.set("is_superuser", "false");
+  const ordering = drfOrdering(ORDER_FIELD[sortBy], sortOrder);
+  if (ordering) params.set("ordering", ordering);
 
-  const total = users.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const items = users.slice((page - 1) * pageSize, page * pageSize);
+  const res = await callBackend(`/users/?${params}`);
+  if (!res.ok) return jsonError(res.status || 502, "BACKEND_ERROR", backendErrorMessage(res.data));
 
-  return jsonData<Paginated<DbUser>>({
-    items,
-    page,
-    pageSize,
-    total,
-    totalPages,
+  const paginated = toPaginated<RawUser>(res.data, page, pageSize);
+  return jsonData<Paginated<User>>({
+    ...paginated,
+    items: paginated.items.map(toUser),
   });
 }
 
@@ -66,33 +76,33 @@ export async function POST(request: NextRequest) {
   const auth = requireAuth(request, "users:create");
   if ("response" in auth) return auth.response;
 
-  await simulateLatency();
-
-  const body = await request.json().catch(() => null);
-  const parsed = createUserFormSchema().safeParse(body);
-  if (!parsed.success) {
-    return jsonError(
-      422,
-      "VALIDATION_ERROR",
-      "Invalid user data.",
-      z.flattenError(parsed.error).fieldErrors as Record<string, string[]>,
-    );
+  const body = (await request.json().catch(() => null)) as
+    | {
+        name?: string;
+        email?: string;
+        phone?: string;
+        isSuperAdmin?: boolean;
+        isActive?: boolean;
+        password?: string;
+      }
+    | null;
+  if (!body?.email) {
+    return jsonError(422, "VALIDATION_ERROR", "Email is required.");
   }
 
-  const db = getDb();
-  const emailTaken = db.users.some(
-    (user) => user.email.toLowerCase() === parsed.data.email.toLowerCase(),
-  );
-  if (emailTaken) {
-    return jsonError(409, "EMAIL_TAKEN", "A user with this email already exists.");
+  const res = await callBackend<RawUser>("/users/", {
+    method: "POST",
+    body: {
+      email: body.email,
+      fullName: body.name ?? "",
+      phone: body.phone ?? "",
+      isSuperAdmin: body.isSuperAdmin ?? false,
+      isActive: body.isActive ?? true,
+      password: body.password || "",
+    },
+  });
+  if (!res.ok) {
+    return jsonError(res.status || 502, "BACKEND_ERROR", backendErrorMessage(res.data));
   }
-
-  const user: DbUser = {
-    id: allocateUserId(),
-    ...parsed.data,
-    createdAt: new Date().toISOString(),
-  };
-  db.users.unshift(user);
-
-  return jsonData(user, { status: 201 });
+  return jsonData(toUser(res.data), { status: 201 });
 }

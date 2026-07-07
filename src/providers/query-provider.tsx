@@ -4,7 +4,7 @@ import * as React from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-import { makeQueryClient } from "@/lib/api/query-client";
+import { makeQueryClient } from "@/shared/api/query-client";
 
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   // useState (not useMemo) guarantees a stable client across re-renders and

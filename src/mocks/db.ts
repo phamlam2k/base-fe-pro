@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { Role } from "@/config/permissions";
+import type { Role } from "@/shared/config/permissions";
 
 /**
  * In-memory mock database backing the /api route handlers.
@@ -93,9 +93,104 @@ function seedUsers(): DbUser[] {
   return [...demoAccounts, ...generated];
 }
 
+// ===========================================================================
+// Organization / RBAC mock data (see thiet-ke-phan-quyen-rbac.md)
+// Platform → Company → Project → Team (TVGS / Nhà Thầu / Thí Nghiệm).
+// ===========================================================================
+export type OrgCompanyStatus = "ACTIVE" | "SUSPENDED";
+export type OrgRole = "COMPANY_ADMIN" | "COMPANY_DELEGATE" | "COMPANY_MEMBER";
+export type OrgTeamType = "SUPERVISION" | "CONTRACTOR" | "TESTING";
+
+export interface DbCompany {
+  id: string;
+  name: string;
+  status: OrgCompanyStatus;
+  createdAt: string;
+}
+
+export interface DbMember {
+  id: string;
+  companyId: string;
+  name: string;
+  email: string;
+  role: OrgRole;
+  customTitle: string;
+  createdAt: string;
+}
+
+export interface DbProject {
+  id: string;
+  companyId: string;
+  name: string;
+  status: OrgCompanyStatus;
+  createdAt: string;
+}
+
+export interface DbTeam {
+  id: string;
+  projectId: string;
+  parentTeamId: string | null;
+  teamType: OrgTeamType;
+  name: string;
+  memberCount: number;
+  createdAt: string;
+}
+
+function iso(daysAgo: number): string {
+  return new Date(SEED_BASE_MS - daysAgo * DAY_MS).toISOString();
+}
+
+function seedCompanies(): DbCompany[] {
+  return [
+    { id: "com_001", name: "Tập đoàn Xây dựng Hòa Bình", status: "ACTIVE", createdAt: iso(500) },
+    { id: "com_002", name: "Công ty CP Đầu tư Coteccons", status: "ACTIVE", createdAt: iso(380) },
+    { id: "com_003", name: "Chủ đầu tư Vinhomes Central", status: "SUSPENDED", createdAt: iso(210) },
+  ];
+}
+
+function seedMembers(): DbMember[] {
+  return [
+    // com_001 — a fully staffed company
+    { id: "mem_001", companyId: "com_001", name: "Nguyễn Văn Tổng", email: "tonggd@hoabinh.vn", role: "COMPANY_ADMIN", customTitle: "Tổng Giám đốc", createdAt: iso(500) },
+    { id: "mem_002", companyId: "com_001", name: "Trần Thị Phó", email: "photong@hoabinh.vn", role: "COMPANY_DELEGATE", customTitle: "Phó Tổng Giám đốc", createdAt: iso(480) },
+    { id: "mem_003", companyId: "com_001", name: "Lê Minh Ủy", email: "uyquyen@hoabinh.vn", role: "COMPANY_DELEGATE", customTitle: "Giám đốc Dự án", createdAt: iso(300) },
+    { id: "mem_004", companyId: "com_001", name: "Phạm Quốc Thành", email: "thanhpq@hoabinh.vn", role: "COMPANY_MEMBER", customTitle: "", createdAt: iso(260) },
+    { id: "mem_005", companyId: "com_001", name: "Hoàng Thị Lan", email: "lanht@hoabinh.vn", role: "COMPANY_MEMBER", customTitle: "", createdAt: iso(120) },
+    // com_002
+    { id: "mem_006", companyId: "com_002", name: "Đỗ Văn Cường", email: "cuongdv@coteccons.vn", role: "COMPANY_ADMIN", customTitle: "Tổng Giám đốc", createdAt: iso(380) },
+    { id: "mem_007", companyId: "com_002", name: "Vũ Thị Hồng", email: "hongvt@coteccons.vn", role: "COMPANY_MEMBER", customTitle: "", createdAt: iso(150) },
+    // com_003
+    { id: "mem_008", companyId: "com_003", name: "Bùi Anh Dũng", email: "dungba@vinhomes.vn", role: "COMPANY_ADMIN", customTitle: "Tổng Giám đốc", createdAt: iso(210) },
+  ];
+}
+
+function seedProjects(): DbProject[] {
+  return [
+    { id: "prj_001", companyId: "com_001", name: "Cao ốc Landmark 81 — Giai đoạn 2", status: "ACTIVE", createdAt: iso(400) },
+    { id: "prj_002", companyId: "com_001", name: "Khu đô thị Ecopark Grand", status: "ACTIVE", createdAt: iso(200) },
+    { id: "prj_003", companyId: "com_002", name: "Nhà máy Nhiệt điện Vũng Áng", status: "ACTIVE", createdAt: iso(300) },
+  ];
+}
+
+function seedTeams(): DbTeam[] {
+  return [
+    // prj_001 — two independent supervision roots (TVGS), each with children.
+    { id: "tea_001", projectId: "prj_001", parentTeamId: null, teamType: "SUPERVISION", name: "TVGS Nhóm 1 — Kết cấu", memberCount: 4, createdAt: iso(390) },
+    { id: "tea_002", projectId: "prj_001", parentTeamId: "tea_001", teamType: "CONTRACTOR", name: "Nhà Thầu A — Cơ điện", memberCount: 6, createdAt: iso(380) },
+    { id: "tea_003", projectId: "prj_001", parentTeamId: "tea_001", teamType: "TESTING", name: "Thí Nghiệm A — Bê tông", memberCount: 3, createdAt: iso(370) },
+    { id: "tea_004", projectId: "prj_001", parentTeamId: null, teamType: "SUPERVISION", name: "TVGS Nhóm 2 — Hạ tầng", memberCount: 3, createdAt: iso(360) },
+    { id: "tea_005", projectId: "prj_001", parentTeamId: "tea_004", teamType: "CONTRACTOR", name: "Nhà Thầu B — San lấp", memberCount: 5, createdAt: iso(350) },
+  ];
+}
+
 interface MockDb {
   users: DbUser[];
   nextId: number;
+  companies: DbCompany[];
+  members: DbMember[];
+  projects: DbProject[];
+  teams: DbTeam[];
+  nextOrgId: number;
 }
 
 const globalStore = globalThis as unknown as { __mockDb?: MockDb };
@@ -103,7 +198,15 @@ const globalStore = globalThis as unknown as { __mockDb?: MockDb };
 export function getDb(): MockDb {
   if (!globalStore.__mockDb) {
     const users = seedUsers();
-    globalStore.__mockDb = { users, nextId: users.length + 1 };
+    globalStore.__mockDb = {
+      users,
+      nextId: users.length + 1,
+      companies: seedCompanies(),
+      members: seedMembers(),
+      projects: seedProjects(),
+      teams: seedTeams(),
+      nextOrgId: 1000,
+    };
   }
   return globalStore.__mockDb;
 }
@@ -111,6 +214,12 @@ export function getDb(): MockDb {
 export function allocateUserId(): string {
   const db = getDb();
   return `usr_${String(db.nextId++).padStart(3, "0")}`;
+}
+
+/** Allocate an id for any organization entity (company/member/project/team). */
+export function allocateOrgId(prefix: string): string {
+  const db = getDb();
+  return `${prefix}_${db.nextOrgId++}`;
 }
 
 /** Simulated network latency so loading states are visible in dev. */

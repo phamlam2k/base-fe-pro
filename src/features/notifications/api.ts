@@ -1,7 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 
-import { apiClient } from "@/lib/api/axios";
-import type { ApiResponse } from "@/types/api";
+import { apiClient } from "@/shared/api/axios";
+import type { ApiResponse } from "@/shared/api/types";
 
 export interface Notification {
   id: string;

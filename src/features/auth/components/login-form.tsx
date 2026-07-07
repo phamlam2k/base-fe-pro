@@ -7,15 +7,15 @@ import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/shared/ui/alert";
+import { Button } from "@/shared/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/ui/card";
 import {
   Form,
   FormControl,
@@ -23,9 +23,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { isApiError } from "@/lib/api/axios";
+} from "@/shared/ui/form";
+import { Input } from "@/shared/ui/input";
+import { isApiError } from "@/shared/api/axios";
 import { useLogin } from "@/features/auth/hooks";
 import { createLoginSchema, type LoginValues } from "@/features/auth/schemas";
 

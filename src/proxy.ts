@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { can } from "@/config/permissions";
+import { can } from "@/shared/config/permissions";
 import {
   ROUTES,
   isPublicRoute,
   requiredPermissionFor,
-} from "@/config/routes";
-import { AUTH_COOKIE, decodeSessionToken } from "@/lib/auth/token";
+} from "@/shared/config/routes";
+import { AUTH_COOKIE, decodeSessionToken } from "@/shared/lib/auth/token";
 
 /**
  * Route protection at the network boundary (Next.js 16 renamed `middleware`

@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 /** Route-level fallback while server components resolve. */
 export default function DashboardLoading() {

@@ -19,5 +19,5 @@ export {
 // Query keys/options phải share toàn app — react-query cache là một cây chung.
 export { userKeys, userListOptions, usersApi } from "./api";
 
-export { USER_STATUSES } from "./types";
-export type { User, UserStatus, UserListParams } from "./types";
+export { SUPER_ADMIN_FILTERS } from "./types";
+export type { User, SuperAdminFilter, UserListParams } from "./types";

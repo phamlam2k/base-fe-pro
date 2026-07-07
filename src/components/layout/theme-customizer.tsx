@@ -3,14 +3,14 @@
 import { Check, Paintbrush, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/shared/ui/button";
+import { Label } from "@/shared/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+} from "@/shared/ui/popover";
+import { cn } from "@/shared/lib/utils";
 import {
   DENSITY_OPTIONS,
   RADIUS_OPTIONS,

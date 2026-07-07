@@ -7,7 +7,7 @@ import {
   canAny,
   type Permission,
   type Role,
-} from "@/config/permissions";
+} from "@/shared/config/permissions";
 
 /** Client-side mirror of the server session (see lib/auth/session.ts). */
 export interface SessionUser {

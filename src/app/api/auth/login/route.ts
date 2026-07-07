@@ -1,55 +1,82 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
-import { jsonError } from "@/lib/api/server";
+import { jsonError } from "@/shared/api/server";
+import { callBackend } from "@/shared/api/backend";
+import { platformRoleToAppRole } from "@/shared/lib/auth/roles";
 import {
   AUTH_COOKIE,
   SESSION_MAX_AGE_SECONDS,
   encodeSessionToken,
-} from "@/lib/auth/token";
-import { DEMO_PASSWORD, getDb, simulateLatency } from "@/mocks/db";
-import type { ApiResponse } from "@/types/api";
-import type { SessionUser } from "@/lib/auth/session";
+} from "@/shared/lib/auth/token";
+import type { ApiResponse } from "@/shared/api/types";
+import type { SessionUser } from "@/shared/lib/auth/session";
 
 const loginSchema = z.object({
   email: z.email(),
   password: z.string().min(1),
 });
 
-export async function POST(request: NextRequest) {
-  await simulateLatency();
+interface TokenPair {
+  access?: string;
+  refresh?: string;
+}
 
+interface MeResponse {
+  id: string;
+  email: string;
+  fullName?: string;
+  platformRole?: string;
+}
+
+/**
+ * Real login: exchange email+password for a Django JWT, fetch the profile,
+ * then store both tokens + the mapped role in an httpOnly session cookie.
+ */
+export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   const parsed = loginSchema.safeParse(body);
   if (!parsed.success) {
     return jsonError(422, "VALIDATION_ERROR", "Invalid email or password.");
   }
 
-  const { email, password } = parsed.data;
-  const user = getDb().users.find(
-    (candidate) => candidate.email.toLowerCase() === email.toLowerCase(),
-  );
-
-  // Mock rule: any seeded user + the shared demo password.
-  if (!user || password !== DEMO_PASSWORD) {
+  // 1. Obtain the JWT pair (SimpleJWT's TokenObtainPairView uses email+password).
+  const tokenRes = await callBackend<TokenPair>("/auth/token/", {
+    method: "POST",
+    body: parsed.data,
+    anonymous: true,
+  });
+  if (!tokenRes.ok || !tokenRes.data?.access || !tokenRes.data?.refresh) {
+    if (tokenRes.status === 0) {
+      return jsonError(502, "BACKEND_UNREACHABLE", "Cannot reach the server.");
+    }
     return jsonError(401, "INVALID_CREDENTIALS", "Invalid email or password.");
   }
-  if (user.status === "suspended") {
-    return jsonError(403, "ACCOUNT_SUSPENDED", "This account is suspended.");
+  const { access, refresh } = tokenRes.data;
+
+  // 2. Fetch the profile (identity + platform role) with the fresh access token.
+  const meRes = await callBackend<MeResponse>("/auth/me/", {
+    accessToken: access,
+  });
+  if (!meRes.ok || !meRes.data?.id) {
+    return jsonError(401, "INVALID_CREDENTIALS", "Could not load your profile.");
   }
 
+  const role = platformRoleToAppRole(meRes.data.platformRole);
   const sessionUser: SessionUser = {
-    id: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    id: meRes.data.id,
+    email: meRes.data.email,
+    name: meRes.data.fullName || meRes.data.email,
+    role,
   };
 
   const token = encodeSessionToken({
-    sub: user.id,
-    email: user.email,
-    name: user.name,
-    role: user.role,
+    sub: sessionUser.id,
+    email: sessionUser.email,
+    name: sessionUser.name,
+    role,
+    access,
+    refresh,
     exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SECONDS,
   });
 

@@ -1,86 +1,75 @@
 import type { NextRequest } from "next/server";
-import { z } from "zod";
 
-import { jsonData, jsonError, requireAuth } from "@/lib/api/server";
-import { createUserFormSchema } from "@/features/users/schemas";
-import { getDb, simulateLatency } from "@/mocks/db";
+import { backendErrorMessage, callBackend } from "@/shared/api/backend";
+import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
+import type { User } from "@/features/users/types";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  const auth = requireAuth(request, "users:view");
-  if ("response" in auth) return auth.response;
+interface RawUser {
+  id: string;
+  email: string;
+  fullName: string;
+  phone: string;
+  isActive: boolean;
+  isSuperAdmin: boolean;
+  dateJoined: string;
+}
 
-  await simulateLatency(200);
-
-  const { id } = await params;
-  const user = getDb().users.find((candidate) => candidate.id === id);
-  if (!user) {
-    return jsonError(404, "NOT_FOUND", "User not found.");
-  }
-  return jsonData(user);
+function toUser(raw: RawUser): User {
+  return {
+    id: raw.id,
+    name: raw.fullName ?? "",
+    email: raw.email,
+    phone: raw.phone ?? "",
+    isSuperAdmin: raw.isSuperAdmin,
+    isActive: raw.isActive,
+    createdAt: raw.dateJoined,
+  };
 }
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const auth = requireAuth(request, "users:update");
   if ("response" in auth) return auth.response;
 
-  await simulateLatency();
-
   const { id } = await params;
-  const db = getDb();
-  const user = db.users.find((candidate) => candidate.id === id);
-  if (!user) {
-    return jsonError(404, "NOT_FOUND", "User not found.");
-  }
+  const body = (await request.json().catch(() => null)) as
+    | {
+        name?: string;
+        email?: string;
+        phone?: string;
+        isSuperAdmin?: boolean;
+        isActive?: boolean;
+        password?: string;
+      }
+    | null;
 
-  const body = await request.json().catch(() => null);
-  const parsed = createUserFormSchema().partial().safeParse(body);
-  if (!parsed.success) {
-    return jsonError(
-      422,
-      "VALIDATION_ERROR",
-      "Invalid user data.",
-      z.flattenError(parsed.error).fieldErrors as Record<string, string[]>,
-    );
-  }
+  const payload: Record<string, unknown> = {};
+  if (body?.name !== undefined) payload.fullName = body.name;
+  if (body?.email !== undefined) payload.email = body.email;
+  if (body?.phone !== undefined) payload.phone = body.phone;
+  if (body?.isSuperAdmin !== undefined) payload.isSuperAdmin = body.isSuperAdmin;
+  if (body?.isActive !== undefined) payload.isActive = body.isActive;
+  if (body?.password) payload.password = body.password;
 
-  if (parsed.data.email) {
-    const emailTaken = db.users.some(
-      (candidate) =>
-        candidate.id !== id &&
-        candidate.email.toLowerCase() === parsed.data.email!.toLowerCase(),
-    );
-    if (emailTaken) {
-      return jsonError(
-        409,
-        "EMAIL_TAKEN",
-        "A user with this email already exists.",
-      );
-    }
+  const res = await callBackend<RawUser>(`/users/${id}/`, {
+    method: "PATCH",
+    body: payload,
+  });
+  if (!res.ok) {
+    return jsonError(res.status || 502, "BACKEND_ERROR", backendErrorMessage(res.data));
   }
-
-  Object.assign(user, parsed.data);
-  return jsonData(user);
+  return jsonData(toUser(res.data));
 }
 
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const auth = requireAuth(request, "users:delete");
   if ("response" in auth) return auth.response;
 
-  await simulateLatency();
-
   const { id } = await params;
-  if (id === auth.user.id) {
-    return jsonError(400, "CANNOT_DELETE_SELF", "You cannot delete your own account.");
+  const res = await callBackend(`/users/${id}/`, { method: "DELETE" });
+  if (!res.ok) {
+    return jsonError(res.status || 502, "BACKEND_ERROR", backendErrorMessage(res.data));
   }
-
-  const db = getDb();
-  const index = db.users.findIndex((candidate) => candidate.id === id);
-  if (index === -1) {
-    return jsonError(404, "NOT_FOUND", "User not found.");
-  }
-
-  db.users.splice(index, 1);
   return jsonData(null);
 }

@@ -16,10 +16,10 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { NAV_GROUPS } from "@/config/nav";
-import { ROUTES } from "@/config/routes";
-import { siteConfig } from "@/config/site";
+} from "@/shared/ui/sidebar";
+import { NAV_GROUPS } from "@/shared/config/nav";
+import { ROUTES } from "@/shared/config/routes";
+import { siteConfig } from "@/shared/config/site";
 import { usePermission } from "@/providers/session-provider";
 
 export function AppSidebar() {
@@ -45,7 +45,7 @@ export function AppSidebar() {
                 <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
+                <div className="grid flex-1 text-left text-lg leading-tight">
                   <span className="truncate font-semibold">
                     {siteConfig.name}
                   </span>
@@ -76,7 +76,7 @@ export function AppSidebar() {
                         isActive={isActive}
                         tooltip={t(item.titleKey)}
                       >
-                        <Link href={item.href}>
+                        <Link href={item.href} className="text-lg">
                           <item.icon />
                           <span>{t(item.titleKey)}</span>
                         </Link>

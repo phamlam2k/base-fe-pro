@@ -1,0 +1,587 @@
+{
+  "common": {
+    "appName": "Base FE Pro",
+    "loading": "Loading...",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "view": "View",
+    "toggleColumns": "Toggle columns",
+    "noResults": "No results found.",
+    "somethingWentWrong": "Something went wrong",
+    "retry": "Try again",
+    "rowsPerPage": "Rows per page",
+    "pageOf": "Page {page} of {total}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "openMenu": "Open menu",
+    "notFoundTitle": "Page not found",
+    "notFoundDescription": "The page you are looking for does not exist or has been moved.",
+    "backToDashboard": "Back to dashboard"
+  },
+  "nav": {
+    "overview": "Overview",
+    "dashboard": "Dashboard",
+    "management": "Management",
+    "users": "Users",
+    "products": "Products",
+    "orders": "Orders",
+    "examples": "Examples",
+    "formExample": "Form example",
+    "wizardExample": "Wizard example",
+    "settings": "Settings",
+    "appearance": "Appearance",
+    "profile": "Profile",
+    "logout": "Log out",
+    "myAccount": "My account",
+    "organization": "Access control"
+  },
+  "auth": {
+    "loginTitle": "Sign in to your account",
+    "loginSubtitle": "Enter your email and password to continue",
+    "email": "Email",
+    "emailPlaceholder": "you@company.com",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in...",
+    "demoAccounts": "Demo accounts (password: {password})",
+    "loginSuccess": "Welcome back, {name}!",
+    "forbiddenTitle": "Access denied",
+    "forbiddenDescription": "You don't have permission to view this page. Contact an administrator if you believe this is a mistake.",
+    "validation": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Enter a valid email address",
+      "passwordRequired": "Password is required",
+      "passwordMin": "Password must be at least 8 characters"
+    }
+  },
+  "users": {
+    "title": "User management",
+    "description": "Create and manage platform accounts. SuperAdmin only.",
+    "addUser": "Add user",
+    "editUser": "Edit user",
+    "deleteUser": "Delete user",
+    "deleteConfirmTitle": "Delete {name}?",
+    "deleteConfirmDescription": "This will permanently remove the user and cannot be undone.",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created",
+    "searchPlaceholder": "Search by name, email or phone...",
+    "allRoles": "All roles",
+    "allStatuses": "All statuses",
+    "created": "User created successfully",
+    "updated": "User updated successfully",
+    "deleted": "User deleted successfully",
+    "formDescription": "Fill in the information below. The user will receive an invitation email.",
+    "namePlaceholder": "Jane Cooper",
+    "roleDescription": "Determines what the user can see and do.",
+    "roles": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "viewer": "Viewer"
+    },
+    "statuses": {
+      "active": "Active",
+      "invited": "Invited",
+      "suspended": "Suspended"
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "emailInvalid": "Enter a valid email",
+      "passwordMin": "Password must be at least 8 characters"
+    },
+    "phone": "Phone",
+    "password": "Password",
+    "passwordCreateHint": "At least 8 characters. Leave blank to create without a login password.",
+    "passwordEditHint": "Leave blank to keep the current password.",
+    "superAdmin": "SuperAdmin",
+    "superAdminHint": "Full platform control: manage companies and users.",
+    "normalUser": "Normal user",
+    "active": "Active",
+    "inactive": "Suspended",
+    "activeAccount": "Active account",
+    "activeHint": "Turn off to temporarily block this person from logging in.",
+    "roleColumn": "Access",
+    "statusColumn": "Status",
+    "filter": {
+      "all": "All users",
+      "yes": "SuperAdmins only",
+      "no": "Normal users"
+    }
+  },
+  "products": {
+    "title": "Products",
+    "description": "Manage your catalog: pricing, stock and lifecycle status.",
+    "addProduct": "Add product",
+    "editProduct": "Edit product",
+    "deleteProduct": "Delete product",
+    "deleteConfirmTitle": "Delete {name}?",
+    "deleteConfirmDescription": "This action cannot be undone.",
+    "bulkDeleteConfirmTitle": "Delete {count} selected products?",
+    "deleteSelected": "Delete ({count})",
+    "exportCsv": "Export CSV",
+    "name": "Name",
+    "category": "Category",
+    "price": "Price",
+    "stock": "Stock",
+    "status": "Status",
+    "searchPlaceholder": "Search by name or SKU...",
+    "allCategories": "All categories",
+    "allStatuses": "All statuses",
+    "selectAll": "Select all rows",
+    "selectRow": "Select row",
+    "created": "Product created successfully",
+    "updated": "Product updated successfully",
+    "deleted": "Product deleted successfully",
+    "bulkDeleted": "{count} products deleted",
+    "formDescription": "SKU must be unique across the catalog.",
+    "namePlaceholder": "Aurora Headphones",
+    "categories": {
+      "electronics": "Electronics",
+      "apparel": "Apparel",
+      "home": "Home",
+      "beauty": "Beauty",
+      "sports": "Sports"
+    },
+    "statuses": {
+      "active": "Active",
+      "draft": "Draft",
+      "archived": "Archived"
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "skuFormat": "SKU: letters, digits and dashes, min 3 chars",
+      "categoryRequired": "Select a category",
+      "priceRequired": "Enter a valid price",
+      "priceMin": "Price must be ≥ 0",
+      "stockRequired": "Enter a valid stock count",
+      "stockInt": "Stock must be a whole number",
+      "stockMin": "Stock must be ≥ 0",
+      "statusRequired": "Select a status"
+    }
+  },
+  "orders": {
+    "title": "Orders",
+    "description": "Track orders through their fulfillment workflow.",
+    "detailTitle": "Order detail",
+    "code": "Order",
+    "customer": "Customer",
+    "status": "Status",
+    "total": "Total",
+    "createdAt": "Created",
+    "searchPlaceholder": "Search by code or customer...",
+    "allStatuses": "All statuses",
+    "notFound": "This order does not exist.",
+    "backToOrders": "Back to orders",
+    "product": "Product",
+    "quantity": "Qty",
+    "unitPrice": "Unit price",
+    "lineTotal": "Line total",
+    "statusUpdated": "Order moved to {status}",
+    "tabs": {
+      "overview": "Overview",
+      "items": "Items ({count})",
+      "timeline": "Timeline"
+    },
+    "statuses": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "actions": {
+      "processing": "Start processing",
+      "shipped": "Mark as shipped",
+      "delivered": "Mark as delivered",
+      "cancelled": "Cancel order"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all read",
+    "empty": "You're all caught up."
+  },
+  "commandPalette": {
+    "title": "Command palette",
+    "placeholder": "Type a command or search...",
+    "empty": "No results found.",
+    "navigation": "Navigation",
+    "actions": "Actions",
+    "themeLight": "Theme: light",
+    "themeDark": "Theme: dark",
+    "switchToVietnamese": "Ngôn ngữ: Tiếng Việt",
+    "switchToEnglish": "Language: English"
+  },
+  "wizard": {
+    "title": "Wizard example",
+    "description": "Multi-step form with per-step validation and a persisted draft — leave and come back, your progress is kept.",
+    "steps": {
+      "basics": "Basics",
+      "audience": "Audience & budget",
+      "review": "Review"
+    },
+    "stepDescriptions": {
+      "basics": "Name your campaign and pick an objective.",
+      "audience": "Choose target locations and daily budget.",
+      "review": "Double-check everything before launching."
+    },
+    "name": "Campaign name",
+    "namePlaceholder": "Summer Launch 2026",
+    "objective": "Objective",
+    "objectives": {
+      "awareness": "Brand awareness",
+      "traffic": "Website traffic",
+      "conversions": "Conversions"
+    },
+    "locations": "Locations",
+    "locationLabels": {
+      "vn": "Vietnam",
+      "us": "United States",
+      "eu": "Europe",
+      "jp": "Japan",
+      "global": "Global"
+    },
+    "dailyBudget": "Daily budget (USD)",
+    "dailyBudgetDescription": "Minimum $5 per day.",
+    "terms": "I confirm the campaign follows the advertising policy",
+    "back": "Back",
+    "next": "Continue",
+    "submit": "Launch campaign",
+    "submitted": "Campaign launched!",
+    "validation": {
+      "nameMin": "Campaign name must be at least 3 characters",
+      "objectiveRequired": "Select an objective",
+      "locationsMin": "Select at least one location",
+      "budgetRequired": "Enter a valid budget",
+      "budgetMin": "Daily budget must be at least $5",
+      "termsRequired": "You must accept the terms"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "description": "Overview of your product's key metrics.",
+    "totalUsers": "Total users",
+    "activeUsers": "Active users",
+    "revenue": "Revenue",
+    "growth": "Growth",
+    "vsLastMonth": "{value} vs last month",
+    "revenueChartTitle": "Revenue",
+    "revenueChartDescription": "Revenue vs expenses, last 12 months",
+    "signupsChartTitle": "Signups",
+    "signupsChartDescription": "New users per month",
+    "rolesChartTitle": "Users by role",
+    "rolesChartDescription": "Current role distribution",
+    "recentUsersTitle": "Recent signups",
+    "recentUsersDescription": "Latest users who joined",
+    "series": {
+      "revenue": "Revenue",
+      "expenses": "Expenses",
+      "signups": "Signups"
+    }
+  },
+  "settings": {
+    "appearanceTitle": "Appearance",
+    "appearanceDescription": "Customize how the interface looks for you. Preferences are saved on this device.",
+    "mode": "Mode",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "preset": "Color",
+    "radius": "Radius",
+    "density": "Density",
+    "compact": "Compact",
+    "comfortable": "Comfortable",
+    "spacious": "Spacious",
+    "resetDefaults": "Reset to defaults",
+    "customize": "Customize",
+    "customizeDescription": "Adjust color, radius and density.",
+    "profileTitle": "Profile",
+    "profileDescription": "Update your personal information.",
+    "profileName": "Full name",
+    "profileEmail": "Email",
+    "profileEmailNote": "Contact an administrator to change your email.",
+    "profileBio": "Bio",
+    "profileBioPlaceholder": "A few words about you...",
+    "profileUpdated": "Profile updated",
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "bioMax": "Bio must be at most 240 characters"
+    }
+  },
+  "forms": {
+    "title": "Form example",
+    "description": "Reference implementation of react-hook-form + zod + shadcn/ui covering the common field types.",
+    "cardTitle": "Create project",
+    "cardDescription": "All fields are validated with zod. Check the toast on submit.",
+    "projectName": "Project name",
+    "projectNamePlaceholder": "Apollo Redesign",
+    "projectNameDescription": "Displayed everywhere the project appears.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What is this project about?",
+    "category": "Category",
+    "categoryPlaceholder": "Select a category",
+    "categories": {
+      "web": "Web application",
+      "mobile": "Mobile application",
+      "design": "Design",
+      "marketing": "Marketing"
+    },
+    "deadline": "Deadline",
+    "deadlinePlaceholder": "Pick a date",
+    "priority": "Priority",
+    "priorities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "notifications": "Email notifications",
+    "notificationsDescription": "Receive updates about this project by email.",
+    "terms": "I agree to the terms and conditions",
+    "submit": "Create project",
+    "submitting": "Creating...",
+    "submitted": "Project created",
+    "validation": {
+      "nameMin": "Project name must be at least 3 characters",
+      "descriptionMax": "Description must be at most 500 characters",
+      "categoryRequired": "Select a category",
+      "deadlineRequired": "Pick a deadline",
+      "deadlineFuture": "Deadline must be in the future",
+      "termsRequired": "You must accept the terms"
+    }
+  },
+  "organization": {
+    "title": "Access management",
+    "description": "Manage companies, roles (SuperAdmin, Admin, Delegate, Member) and the project–team structure.",
+    "contextCompany": "Company in view",
+    "summary": {
+      "status": "Status",
+      "members": "Members",
+      "projects": "Projects"
+    },
+    "tabs": {
+      "members": "Members & roles",
+      "structure": "Projects & teams",
+      "companies": "Companies",
+      "guide": "Role guide"
+    },
+    "statuses": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "roles": {
+      "COMPANY_ADMIN": "Admin (CEO)",
+      "COMPANY_DELEGATE": "Delegate",
+      "COMPANY_MEMBER": "Company member"
+    },
+    "roleShort": {
+      "COMPANY_ADMIN": "Full control: create/edit/delete companies, projects, teams and all members.",
+      "COMPANY_DELEGATE": "Equal to the Admin, plus a custom display title.",
+      "COMPANY_MEMBER": "No access until added to a specific project."
+    },
+    "teamTypes": {
+      "SUPERVISION": "Supervision",
+      "CONTRACTOR": "Contractor",
+      "TESTING": "Testing"
+    },
+    "members": {
+      "add": "Add member",
+      "edit": "Edit member",
+      "remove": "Remove from company",
+      "formDescription": "Add a person to the company and choose their role.",
+      "searchPlaceholder": "Search by name or email...",
+      "allRoles": "All roles",
+      "colName": "Full name",
+      "colRole": "Role",
+      "colTitle": "Title",
+      "colJoined": "Joined",
+      "deleteTitle": "Remove {name}?",
+      "deleteDescription": "This person will be removed from the company and all projects. This cannot be undone."
+    },
+    "companies": {
+      "add": "Add company",
+      "formDescription": "Create a new company (owner/client) on the platform.",
+      "searchPlaceholder": "Search by company name...",
+      "colName": "Company",
+      "colStatus": "Status",
+      "colMembers": "Members",
+      "colProjects": "Projects",
+      "colCreated": "Created",
+      "suspend": "Suspend company",
+      "activate": "Reactivate",
+      "empty": "No companies yet. Create the first one."
+    },
+    "projects": {
+      "add": "Add project",
+      "formDescription": "Create a new project (site) under this company.",
+      "pick": "Choose a project:",
+      "none": "No project selected",
+      "empty": "This company has no projects yet.",
+      "edit": "Edit project",
+      "delete": "Delete project",
+      "deleteTitle": "Delete project {name}?",
+      "deleteDescription": "All teams and data in this project will be deleted. This cannot be undone."
+    },
+    "teams": {
+      "title": "Team tree in the project",
+      "add": "Add team",
+      "formDescription": "Create a Supervision (root) team, or a Contractor / Testing team under a Supervision.",
+      "empty": "This project has no teams yet.",
+      "noChildren": "No child teams.",
+      "rootHint": "A Supervision team is a root — it has no parent.",
+      "memberCount": "{count} members",
+      "edit": "Edit team",
+      "delete": "Delete team",
+      "filterAll": "All",
+      "emptyType": "No teams of this type yet.",
+      "deleteTitle": "Delete team {name}?",
+      "deleteDescription": "The team and all its members will be deleted. This cannot be undone.",
+      "deleteRootDescription": "This is a root Supervision team — deleting it ALSO deletes every child Contractor / Testing team and their members. This cannot be undone."
+    },
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Jane Cooper",
+      "email": "Email",
+      "role": "Role",
+      "customTitle": "Display title",
+      "customTitlePlaceholder": "e.g. Deputy CEO",
+      "customTitleHint": "Optional — typically used for a Delegate.",
+      "companyName": "Company name",
+      "companyNamePlaceholder": "e.g. ABC Construction Group",
+      "projectName": "Project name",
+      "projectNamePlaceholder": "e.g. Landmark 81 Tower",
+      "teamName": "Team name",
+      "teamNamePlaceholder": "e.g. Supervision Team 1 — Structure",
+      "teamType": "Team type",
+      "parentTeam": "Parent Supervision team",
+      "parentTeamPlaceholder": "Pick a parent Supervision team",
+      "parentTeamHint": "Contractor / Testing teams must belong to a Supervision team.",
+      "person": "User",
+      "personHint": "Pick from existing accounts. None yet? Create one in User management first."
+    },
+    "toasts": {
+      "companyCreated": "Company created",
+      "companyUpdated": "Company updated",
+      "memberCreated": "Member added",
+      "memberUpdated": "Member updated",
+      "memberDeleted": "Member removed",
+      "projectCreated": "Project created",
+      "teamCreated": "Team created",
+      "projectUpdated": "Project updated",
+      "projectDeleted": "Project deleted",
+      "teamUpdated": "Team updated",
+      "teamDeleted": "Team deleted",
+      "teamMemberAdded": "Team member added",
+      "teamMemberUpdated": "Team member updated",
+      "teamMemberRemoved": "Team member removed",
+      "projectMemberAdded": "Project member assigned",
+      "projectMemberRemoved": "Project member removed"
+    },
+    "validation": {
+      "companyNameMin": "Company name must be at least 2 characters",
+      "nameMin": "Name must be at least 2 characters",
+      "emailInvalid": "Enter a valid email",
+      "roleRequired": "Please select a role",
+      "projectNameMin": "Project name must be at least 2 characters",
+      "teamNameMin": "Team name must be at least 2 characters",
+      "teamTypeRequired": "Please select a team type",
+      "parentRequired": "Contractor / Testing must belong to a Supervision parent"
+    },
+    "guide": {
+      "rolesTitle": "Roles in the system",
+      "lawsTitle": "The 3 access rules",
+      "intro": "Who sees what is decided by these three simple rules.",
+      "role": {
+        "SUPER_ADMIN": {
+          "name": "SuperAdmin (Platform)",
+          "desc": "Manages the list of companies: create, suspend, reactivate. Does not automatically see business data inside a company."
+        },
+        "COMPANY_ADMIN": {
+          "name": "Admin / CEO (Company Admin)",
+          "desc": "Full control within the company: create/edit/delete projects, teams and all members."
+        },
+        "COMPANY_DELEGATE": {
+          "name": "Delegate",
+          "desc": "Equal to the Admin, differing only by a custom display title (e.g. Deputy CEO)."
+        },
+        "COMPANY_MEMBER": {
+          "name": "Company member",
+          "desc": "No access until added to a specific project."
+        },
+        "PROJECT_MEMBER": {
+          "name": "Project member",
+          "desc": "Represents the owner; sees the whole team tree in assigned projects. Cannot create/delete structure."
+        },
+        "TEAM_SUPERVISION": {
+          "name": "Supervision team (TVGS)",
+          "desc": "Sees itself and every child team (Contractor, Testing) beneath it."
+        },
+        "TEAM_CONTRACTOR": {
+          "name": "Contractor team",
+          "desc": "Works only within its own team. Cannot see other contractors or the parent Supervision."
+        },
+        "TEAM_TESTING": {
+          "name": "Testing team",
+          "desc": "Works only within its own team. Cannot see siblings or the parent."
+        }
+      },
+      "lawA": {
+        "tag": "Rule A",
+        "name": "Project isolation",
+        "desc": "A company member only sees directly-assigned projects. Admins and Delegates see every project."
+      },
+      "lawB": {
+        "tag": "Rule B",
+        "name": "Team-tree isolation",
+        "desc": "Each team sees only itself and its descendants — never siblings, never ancestors."
+      },
+      "lawC": {
+        "tag": "Rule C",
+        "name": "Structural admin rights",
+        "desc": "Only Admins and Delegates may create/edit/delete projects, teams and members. Even team leads cannot."
+      }
+    },
+    "teamRoles": {
+      "TEAM_LEAD": "Team lead",
+      "TEAM_MEMBER": "Member"
+    },
+    "teamMembers": {
+      "title": "Team members",
+      "manage": "Members",
+      "add": "Add member",
+      "formDescription": "Invite a person into the team by email and choose their role.",
+      "count": "{count} members",
+      "empty": "This team has no members yet.",
+      "inviteHint": "Invited people get an account by email; set a password so they can log in.",
+      "remove": "Remove from team",
+      "removeTitle": "Remove {name} from the team?",
+      "removeDescription": "This person will be removed from the team. This cannot be undone.",
+      "joinedLabel": "Joined"
+    },
+    "projectMembers": {
+      "title": "Project members (internal)",
+      "hint": "Owner-side people assigned to the project — they see the whole team tree but don't manage structure.",
+      "pickPlaceholder": "Pick a company member...",
+      "assign": "Assign to project",
+      "empty": "No internal members in this project yet.",
+      "remove": "Remove from project",
+      "removeTitle": "Remove {name} from the project?",
+      "removeDescription": "This person will no longer see the project. This cannot be undone."
+    },
+    "picker": {
+      "placeholder": "Select a user...",
+      "searchPlaceholder": "Search by name or email...",
+      "loading": "Searching...",
+      "empty": "No users found. Create one in User management."
+    }
+  }
+}

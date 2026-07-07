@@ -3,7 +3,7 @@
 import * as React from "react";
 import { ThemeProvider } from "next-themes";
 
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { TooltipProvider } from "@/shared/ui/tooltip";
 import { QueryProvider } from "@/providers/query-provider";
 
 /**

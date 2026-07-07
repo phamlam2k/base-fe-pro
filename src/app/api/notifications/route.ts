@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 
-import { jsonData, requireAuth } from "@/lib/api/server";
+import { jsonData, requireAuth } from "@/shared/api/server";
 import { getNotificationsDb } from "@/mocks/notifications";
 import { simulateLatency } from "@/mocks/db";
 

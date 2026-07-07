@@ -20,7 +20,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/shared/ui/card";
 import {
   ChartContainer,
   ChartLegend,
@@ -28,8 +28,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
   type ChartConfig,
-} from "@/components/ui/chart";
-import { Skeleton } from "@/components/ui/skeleton";
+} from "@/shared/ui/chart";
+import { Skeleton } from "@/shared/ui/skeleton";
 import type { DashboardData } from "@/features/dashboard/api";
 
 /** Format a "YYYY-MM" key as a localized short month label. */

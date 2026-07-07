@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "@/shared/ui/page-header";
 import { AppearanceSettings } from "@/features/settings";
 
 export async function generateMetadata(): Promise<Metadata> {

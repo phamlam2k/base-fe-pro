@@ -4,15 +4,15 @@ import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
+} from "@/shared/ui/card";
+import { Label } from "@/shared/ui/label";
+import { Separator } from "@/shared/ui/separator";
 import { ThemeCustomizerControls } from "@/components/layout/theme-customizer";
 
 const MODES = [

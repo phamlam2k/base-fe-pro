@@ -4,9 +4,9 @@ import { LogOut, UserCircle } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
+import { Badge } from "@/shared/ui/badge";
+import { Button } from "@/shared/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,8 +15,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ROUTES } from "@/config/routes";
+} from "@/shared/ui/dropdown-menu";
+import { ROUTES } from "@/shared/config/routes";
 import { useLogout } from "@/features/auth";
 import { useSession } from "@/providers/session-provider";
 

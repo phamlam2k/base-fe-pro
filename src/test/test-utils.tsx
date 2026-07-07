@@ -4,8 +4,8 @@ import { render, type RenderOptions } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { NextIntlClientProvider } from "next-intl";
 
-import messages from "@/messages/en.json";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import messages from "@/shared/config/i18n/messages/en.json";
+import { TooltipProvider } from "@/shared/ui/tooltip";
 import {
   SessionProvider,
   type SessionUser,
