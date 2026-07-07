@@ -4,7 +4,7 @@ import * as React from "react";
 import { ThemeProvider } from "next-themes";
 
 import { TooltipProvider } from "@/shared/ui/tooltip";
-import { QueryProvider } from "@/providers/query-provider";
+import { QueryProvider } from "@/_app/providers/query-provider";
 
 /**
  * Client-side provider composition. Order matters:

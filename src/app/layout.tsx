@@ -5,7 +5,7 @@ import { getLocale, getMessages } from "next-intl/server";
 
 import { Toaster } from "@/shared/ui/sonner";
 import { siteConfig } from "@/shared/config/site";
-import { AppProviders } from "@/providers/app-providers";
+import { AppProviders } from "@/_app";
 
 import "./globals.css";
 
