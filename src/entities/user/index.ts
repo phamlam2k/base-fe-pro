@@ -1,6 +1,7 @@
 /** Public API of the `user` entity (FSD). */
 export { userApi } from "./api/user.api";
 export { userQueries } from "./api/user.queries";
+export { UserPicker } from "./ui/user-picker";
 export {
   SUPER_ADMIN_FILTERS,
   createUserFormSchema,

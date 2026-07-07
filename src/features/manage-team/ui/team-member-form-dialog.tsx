@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/ui/select";
-import { UserPicker } from "@/features/pick-user";
+import { UserPicker } from "@/entities/user";
 import { useCreateTeamMember } from "../model/hooks";
 import {
   createTeamMemberFormSchema,

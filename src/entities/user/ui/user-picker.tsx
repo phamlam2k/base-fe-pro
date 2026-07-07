@@ -17,10 +17,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/shared/ui/popover";
+import { useQuery } from "@tanstack/react-query";
+
 import { useDebounce } from "@/shared/lib/use-debounce";
 import { cn } from "@/shared/lib/utils";
-import { useUserLookup } from "@/features/pick-user/model/use-user-lookup";
-import type { UserOption } from "@/entities/user";
+import { userQueries } from "../api/user.queries";
+import type { UserOption } from "../model/user";
 
 /**
  * Search-and-pick an EXISTING user account (id/name/email). Replaces raw email
@@ -40,7 +42,7 @@ export function UserPicker({
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const debounced = useDebounce(search);
-  const query = useUserLookup(debounced);
+  const query = useQuery(userQueries.lookup(debounced));
   const users = query.data ?? [];
 
   return (
