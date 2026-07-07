@@ -3,12 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/shared/ui/badge";
-import { cn } from "@/shared/lib/utils";
-import type {
-  CompanyStatus,
-  OrgRole,
-  TeamType,
-} from "@/features/organization/types";
+import type { OrgRole, TeamType } from "@/features/organization/types";
 
 const ROLE_VARIANT: Record<OrgRole, "default" | "secondary" | "outline"> = {
   COMPANY_ADMIN: "default",
@@ -19,21 +14,6 @@ const ROLE_VARIANT: Record<OrgRole, "default" | "secondary" | "outline"> = {
 export function RoleBadge({ role }: { role: OrgRole }) {
   const t = useTranslations("organization");
   return <Badge variant={ROLE_VARIANT[role]}>{t(`roles.${role}`)}</Badge>;
-}
-
-const STATUS_DOT: Record<CompanyStatus, string> = {
-  ACTIVE: "bg-emerald-500",
-  SUSPENDED: "bg-red-500",
-};
-
-export function StatusBadge({ status }: { status: CompanyStatus }) {
-  const t = useTranslations("organization");
-  return (
-    <Badge variant="outline" className="gap-1.5">
-      <span className={cn("size-1.5 rounded-full", STATUS_DOT[status])} />
-      {t(`statuses.${status}`)}
-    </Badge>
-  );
 }
 
 const TEAM_TYPE_STYLE: Record<TeamType, string> = {

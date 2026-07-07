@@ -1,11 +1,14 @@
 import { z } from "zod";
 
-import {
-  COMPANY_STATUSES,
-  ORG_ROLES,
-  TEAM_ROLES,
-  TEAM_TYPES,
-} from "@/features/organization/types";
+import { ORG_ROLES, TEAM_ROLES, TEAM_TYPES } from "@/features/organization/types";
+
+// Company schemas graduated to the company entity; re-export for the rest of
+// the (not-yet-migrated) organization domain.
+export {
+  createCompanyFormSchema,
+  companyListQuerySchema,
+} from "@/entities/company";
+export type { CompanyFormValues } from "@/entities/company";
 
 /**
  * Schema factory pattern (see users/schemas.ts): the client passes a
@@ -13,17 +16,6 @@ import {
  * calls the factory with no argument and gets the English fallbacks.
  */
 type TFn = (key: string) => string;
-
-export function createCompanyFormSchema(t?: TFn) {
-  const msg = (key: string, fallback: string) => (t ? t(key) : fallback);
-  return z.object({
-    name: z
-      .string()
-      .min(2, { message: msg("validation.companyNameMin", "Tên công ty tối thiểu 2 ký tự") }),
-    status: z.enum(COMPANY_STATUSES),
-  });
-}
-export type CompanyFormValues = z.infer<ReturnType<typeof createCompanyFormSchema>>;
 
 export function createMemberFormSchema(t?: TFn) {
   const msg = (key: string, fallback: string) => (t ? t(key) : fallback);
@@ -84,15 +76,6 @@ export type TeamMemberFormValues = z.infer<
 // ---------------------------------------------------------------------------
 // Query-string schemas used by the API proxy routes (server-side).
 // ---------------------------------------------------------------------------
-export const companyListQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(10),
-  search: z.string().optional(),
-  status: z.enum([...COMPANY_STATUSES, "all"]).optional(),
-  sortBy: z.enum(["name", "createdAt"]).default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
-});
-
 export const memberListQuerySchema = z.object({
   companyId: z.string().min(1),
   page: z.coerce.number().int().min(1).default(1),

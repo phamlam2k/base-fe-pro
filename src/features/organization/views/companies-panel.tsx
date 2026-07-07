@@ -22,7 +22,7 @@ import { DataTableColumnHeader } from "@/shared/ui/data-table/data-table-column-
 import { PermissionGate } from "@/shared/ui/permission-gate";
 import { usePermission } from "@/providers/session-provider";
 import { useDebounce } from "@/shared/lib/use-debounce";
-import { StatusBadge } from "@/features/organization/components/badges";
+import { CompanyStatusBadge } from "@/entities/company";
 import { CompanyFormDialog } from "@/features/organization/dialogs/company-form-dialog";
 import { useCompanies, useUpdateCompany } from "@/features/organization/hooks";
 import type { Company, CompanyListParams } from "@/features/organization/types";
@@ -67,7 +67,7 @@ export function CompaniesPanel() {
       {
         accessorKey: "status",
         header: t("companies.colStatus"),
-        cell: ({ row }) => <StatusBadge status={row.original.status} />,
+        cell: ({ row }) => <CompanyStatusBadge status={row.original.status} />,
       },
       {
         accessorKey: "memberCount",

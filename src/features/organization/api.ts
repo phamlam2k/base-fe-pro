@@ -3,15 +3,12 @@ import { keepPreviousData, queryOptions } from "@tanstack/react-query";
 import { apiClient } from "@/shared/api/axios";
 import type { ApiResponse, Paginated } from "@/shared/api/types";
 import type {
-  CompanyFormValues,
   MemberFormValues,
   ProjectFormValues,
   TeamFormValues,
   TeamMemberFormValues,
 } from "@/features/organization/schemas";
 import type {
-  Company,
-  CompanyListParams,
   Member,
   MemberListParams,
   OrgRole,
@@ -37,23 +34,7 @@ const BASE = "/organization";
 
 /** Raw HTTP calls — the contract only, no caching concerns. */
 export const organizationApi = {
-  // --- Companies (platform / SuperAdmin scope) ---
-  listCompanies: async (params: CompanyListParams): Promise<Paginated<Company>> => {
-    const res = await apiClient.get<ApiResponse<Paginated<Company>>>(
-      `${BASE}/companies`,
-      { params },
-    );
-    return res.data.data;
-  },
-  createCompany: async (input: CompanyFormValues): Promise<Company> => {
-    const res = await apiClient.post<ApiResponse<Company>>(`${BASE}/companies`, input);
-    return res.data.data;
-  },
-  updateCompany: async (id: string, input: Partial<CompanyFormValues>): Promise<Company> => {
-    const res = await apiClient.patch<ApiResponse<Company>>(`${BASE}/companies/${id}`, input);
-    return res.data.data;
-  },
-
+  // Companies moved to entities/company (companyApi).
   // --- Company members (roles: Admin / Delegate / Member) ---
   listMembers: async (params: MemberListParams): Promise<Paginated<Member>> => {
     const res = await apiClient.get<ApiResponse<Paginated<Member>>>(
@@ -192,10 +173,6 @@ export const organizationApi = {
 export const organizationKeys = {
   all: ["organization"] as const,
 
-  companies: () => [...organizationKeys.all, "companies"] as const,
-  companyList: (params: CompanyListParams) =>
-    [...organizationKeys.companies(), params] as const,
-
   members: () => [...organizationKeys.all, "members"] as const,
   memberList: (params: MemberListParams) =>
     [...organizationKeys.members(), params] as const,
@@ -215,14 +192,6 @@ export const organizationKeys = {
   userLookup: (search: string) =>
     [...organizationKeys.all, "user-lookup", search] as const,
 };
-
-export function companyListOptions(params: CompanyListParams) {
-  return queryOptions({
-    queryKey: organizationKeys.companyList(params),
-    queryFn: () => organizationApi.listCompanies(params),
-    placeholderData: keepPreviousData,
-  });
-}
 
 export function memberListOptions(params: MemberListParams) {
   return queryOptions({

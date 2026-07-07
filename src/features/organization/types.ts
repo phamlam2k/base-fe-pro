@@ -1,4 +1,15 @@
 import type { ListParams } from "@/shared/api/types";
+// Company graduated to its own entity; re-export for the (not-yet-migrated)
+// rest of the organization domain. `CompanyStatus` is reused by Project below.
+import { COMPANY_STATUSES } from "@/entities/company";
+import type {
+  Company,
+  CompanyStatus,
+  CompanyListParams,
+} from "@/entities/company";
+
+export { COMPANY_STATUSES };
+export type { Company, CompanyStatus, CompanyListParams };
 
 /**
  * Organization / RBAC domain types.
@@ -6,13 +17,7 @@ import type { ListParams } from "@/shared/api/types";
  * Mirrors the backend design in `thiet-ke-phan-quyen-rbac.md`:
  * Platform (SuperAdmin) → Company (Admin / Delegate / Member) →
  * Project (Member) → Team tree (TVGS / Nhà Thầu / Thí Nghiệm).
- *
- * These are the ROLES-as-data managed by the console. They are separate from
- * the app's own auth roles (admin / manager / viewer) that gate the page.
  */
-
-export const COMPANY_STATUSES = ["ACTIVE", "SUSPENDED"] as const;
-export type CompanyStatus = (typeof COMPANY_STATUSES)[number];
 
 /** Roles a person can hold inside a company. SuperAdmin is platform-level. */
 export const ORG_ROLES = [
@@ -27,15 +32,6 @@ export type TeamType = (typeof TEAM_TYPES)[number];
 
 export const TEAM_ROLES = ["TEAM_LEAD", "TEAM_MEMBER"] as const;
 export type TeamRole = (typeof TEAM_ROLES)[number];
-
-export interface Company {
-  id: string;
-  name: string;
-  status: CompanyStatus;
-  memberCount: number;
-  projectCount: number;
-  createdAt: string;
-}
 
 export interface Member {
   id: string;
@@ -93,11 +89,6 @@ export interface UserOption {
   id: string;
   name: string;
   email: string;
-}
-
-export interface CompanyListParams extends ListParams {
-  status?: CompanyStatus | "all";
-  sortBy?: "name" | "createdAt";
 }
 
 export interface MemberListParams extends ListParams {

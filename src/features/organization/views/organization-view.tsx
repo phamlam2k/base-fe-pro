@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
-import { StatusBadge } from "@/features/organization/components/badges";
+import { CompanyStatusBadge } from "@/entities/company";
 import { CompaniesPanel } from "@/features/organization/views/companies-panel";
 import { MembersPanel } from "@/features/organization/views/members-panel";
 import { RoleLegend } from "@/features/organization/views/role-legend";
@@ -150,7 +150,7 @@ function CompanyContext({
         {selected ? (
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <Stat label={t("summary.status")}>
-              <StatusBadge status={selected.status} />
+              <CompanyStatusBadge status={selected.status} />
             </Stat>
             <Stat label={t("summary.members")}>
               <span className="text-lg font-semibold tabular-nums">

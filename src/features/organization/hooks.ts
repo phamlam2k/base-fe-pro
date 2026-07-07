@@ -5,7 +5,12 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
-  companyListOptions,
+  companyApi,
+  companyQueries,
+  type CompanyFormValues,
+  type CompanyListParams,
+} from "@/entities/company";
+import {
   memberListOptions,
   organizationApi,
   organizationKeys,
@@ -18,20 +23,16 @@ import {
   type TeamMemberCreateInput,
 } from "@/features/organization/api";
 import type {
-  CompanyFormValues,
   MemberFormValues,
   ProjectFormValues,
   TeamFormValues,
   TeamMemberFormValues,
 } from "@/features/organization/schemas";
-import type {
-  CompanyListParams,
-  MemberListParams,
-} from "@/features/organization/types";
+import type { MemberListParams } from "@/features/organization/types";
 
 // --- Queries -----------------------------------------------------------------
 export function useCompanies(params: CompanyListParams) {
-  return useQuery(companyListOptions(params));
+  return useQuery(companyQueries.list(params));
 }
 
 export function useMembers(params: MemberListParams) {
@@ -51,10 +52,10 @@ export function useCreateCompany() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: (input: CompanyFormValues) => organizationApi.createCompany(input),
+    mutationFn: (input: CompanyFormValues) => companyApi.create(input),
     onSuccess: () => {
       toast.success(t("toasts.companyCreated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -65,10 +66,10 @@ export function useUpdateCompany() {
   const t = useTranslations("organization");
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: Partial<CompanyFormValues> }) =>
-      organizationApi.updateCompany(id, input),
+      companyApi.update(id, input),
     onSuccess: () => {
       toast.success(t("toasts.companyUpdated"));
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -88,7 +89,7 @@ export function useCreateMember(companyId: string) {
     onSuccess: () => {
       toast.success(t("toasts.memberCreated"));
       qc.invalidateQueries({ queryKey: organizationKeys.members() });
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -116,7 +117,7 @@ export function useDeleteMember() {
     onSuccess: () => {
       toast.success(t("toasts.memberDeleted"));
       qc.invalidateQueries({ queryKey: organizationKeys.members() });
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -132,7 +133,7 @@ export function useCreateProject(companyId: string) {
     onSuccess: () => {
       toast.success(t("toasts.projectCreated"));
       qc.invalidateQueries({ queryKey: organizationKeys.projects(companyId) });
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
@@ -160,7 +161,7 @@ export function useDeleteProject(companyId: string) {
     onSuccess: () => {
       toast.success(t("toasts.projectDeleted"));
       qc.invalidateQueries({ queryKey: organizationKeys.projects(companyId) });
-      qc.invalidateQueries({ queryKey: organizationKeys.companies() });
+      qc.invalidateQueries({ queryKey: companyQueries.all() });
     },
     onError: (error) => toast.error(error.message),
   });
