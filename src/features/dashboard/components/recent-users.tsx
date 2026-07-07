@@ -15,7 +15,7 @@ import {
   CardTitle,
 } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 // CROSS-FEATURE REFERENCE EXAMPLE (docs/ARCHITECTURE.md §9):
 // dashboard (composite) uses the `users` core feature — ONLY via its public
 // API. Deep imports like "@/features/users/components/..." are an ESLint error.

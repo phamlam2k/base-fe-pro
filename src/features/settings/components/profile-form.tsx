@@ -27,7 +27,7 @@ import {
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/entities/session";
 
 export function ProfileForm() {
   const t = useTranslations("settings");

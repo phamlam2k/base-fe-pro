@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import type { Permission } from "@/shared/config/permissions";
-import { usePermission } from "@/providers/session-provider";
+import { usePermission } from "@/entities/session/model/session-context";
 
 /**
  * Renders children only when the current user has the permission(s).

@@ -13,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/shared/ui/data-table/data-table-column-header";
-import { PermissionGate } from "@/shared/ui/permission-gate";
-import { usePermission } from "@/providers/session-provider";
+import { PermissionGate } from "@/entities/session";
+import { usePermission } from "@/entities/session";
 import { MemberRoleBadge } from "@/entities/company-member";
 import type { Member } from "@/features/organization/types";
 

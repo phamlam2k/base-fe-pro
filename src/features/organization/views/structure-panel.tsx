@@ -24,7 +24,7 @@ import {
 } from "@/shared/ui/select";
 import { cn } from "@/shared/lib/utils";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 import { TeamTypeBadge } from "@/entities/team";
 import { ProjectFormDialog } from "@/features/organization/dialogs/project-form-dialog";
 import { ProjectMembersCard } from "@/features/organization/views/project-members-card";

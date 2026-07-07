@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 import { buildSessionUser } from "@/test/factories";
 import { renderWithProviders, screen } from "@/test/test-utils";
 

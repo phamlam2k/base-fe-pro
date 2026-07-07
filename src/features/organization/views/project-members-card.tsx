@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 import { MemberRoleBadge } from "@/entities/company-member";
 import {
   useCreateProjectMember,

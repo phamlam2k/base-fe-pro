@@ -16,7 +16,7 @@ import {
 } from "@/shared/ui/dialog";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 import { TeamTypeBadge } from "@/entities/team";
 import { TeamMemberFormDialog } from "@/features/organization/dialogs/team-member-form-dialog";
 import {

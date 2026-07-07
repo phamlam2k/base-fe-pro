@@ -9,7 +9,7 @@ import {
   type Role,
 } from "@/shared/config/permissions";
 
-/** Client-side mirror of the server session (see lib/auth/session.ts). */
+/** Client-side mirror of the server session (see shared/lib/auth/session.ts). */
 export interface SessionUser {
   id: string;
   email: string;

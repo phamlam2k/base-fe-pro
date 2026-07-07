@@ -19,7 +19,7 @@ import {
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { setUserLocale } from "@/shared/config/i18n/actions";
 import { useLogout } from "@/features/auth";
-import { usePermission } from "@/providers/session-provider";
+import { usePermission } from "@/entities/session";
 
 /**
  * Global command palette (Ctrl/Cmd+K): permission-filtered navigation plus

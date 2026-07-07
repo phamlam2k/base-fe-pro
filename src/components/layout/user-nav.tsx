@@ -18,7 +18,7 @@ import {
 } from "@/shared/ui/dropdown-menu";
 import { ROUTES } from "@/shared/config/routes";
 import { useLogout } from "@/features/auth";
-import { useSession } from "@/providers/session-provider";
+import { useSession } from "@/entities/session";
 
 function initialsOf(name: string): string {
   return name

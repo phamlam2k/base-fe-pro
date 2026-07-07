@@ -5,7 +5,7 @@ import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { ROUTES } from "@/shared/config/routes";
 import { getCurrentUser } from "@/shared/lib/auth/session";
-import { SessionProvider } from "@/providers/session-provider";
+import { SessionProvider } from "@/entities/session";
 
 /**
  * Protected shell. The proxy already blocks unauthenticated requests, but we

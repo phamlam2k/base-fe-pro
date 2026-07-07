@@ -9,7 +9,7 @@ import { TooltipProvider } from "@/shared/ui/tooltip";
 import {
   SessionProvider,
   type SessionUser,
-} from "@/providers/session-provider";
+} from "@/entities/session";
 import { buildSessionUser } from "@/test/factories";
 
 /**

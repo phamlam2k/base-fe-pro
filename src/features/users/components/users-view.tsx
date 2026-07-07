@@ -16,7 +16,7 @@ import {
 } from "@/shared/ui/select";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { DataTable } from "@/shared/ui/data-table/data-table";
-import { PermissionGate } from "@/shared/ui/permission-gate";
+import { PermissionGate } from "@/entities/session";
 import { useDebounce } from "@/shared/lib/use-debounce";
 import { getUserColumns } from "@/features/users/components/user-columns";
 import { UserFormDialog } from "@/features/users/components/user-form-dialog";

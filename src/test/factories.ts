@@ -1,4 +1,4 @@
-import type { SessionUser } from "@/providers/session-provider";
+import type { SessionUser } from "@/entities/session";
 import type { User } from "@/features/users";
 import type { Paginated } from "@/shared/api/types";
 

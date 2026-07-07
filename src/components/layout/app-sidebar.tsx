@@ -20,7 +20,7 @@ import {
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { ROUTES } from "@/shared/config/routes";
 import { siteConfig } from "@/shared/config/site";
-import { usePermission } from "@/providers/session-provider";
+import { usePermission } from "@/entities/session";
 
 export function AppSidebar() {
   const t = useTranslations("nav");

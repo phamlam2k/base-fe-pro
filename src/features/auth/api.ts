@@ -1,5 +1,5 @@
 import { apiClient } from "@/shared/api/axios";
-import type { SessionUser } from "@/providers/session-provider";
+import type { SessionUser } from "@/entities/session";
 import type { ApiResponse } from "@/shared/api/types";
 import type { LoginValues } from "@/features/auth/schemas";
 

@@ -13,11 +13,7 @@ import {
 import { ScrollArea } from "@/shared/ui/scroll-area";
 import { Separator } from "@/shared/ui/separator";
 import { cn } from "@/shared/lib/utils";
-import {
-  notificationKeys,
-  notificationsApi,
-  notificationsOptions,
-} from "@/features/notifications/api";
+import { notificationApi, notificationQueries } from "@/entities/notification";
 
 export function NotificationsBell() {
   const t = useTranslations("notifications");
@@ -26,11 +22,11 @@ export function NotificationsBell() {
   const now = useNow({ updateInterval: 60_000 });
   const queryClient = useQueryClient();
 
-  const { data } = useQuery(notificationsOptions());
+  const { data } = useQuery(notificationQueries.list());
   const markAllRead = useMutation({
-    mutationFn: notificationsApi.markAllRead,
+    mutationFn: notificationApi.markAllRead,
     onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: notificationKeys.all }),
+      queryClient.invalidateQueries({ queryKey: notificationQueries.all() }),
   });
 
   const unreadCount = data?.unreadCount ?? 0;
