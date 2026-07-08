@@ -2,9 +2,9 @@ import area from "@turf/area";
 
 import type { GeoPolygon } from "@/entities/project";
 
-/** Rough geographic center + zoom of Vietnam — the map's default view. */
-export const VN_CENTER: [number, number] = [106.0, 16.0];
-export const VN_DEFAULT_ZOOM = 5;
+/** Default map view — Hà Nội city ([lng, lat]). */
+export const DEFAULT_CENTER: [number, number] = [105.8342, 21.0278];
+export const DEFAULT_ZOOM = 12;
 
 /** Area of a GeoJSON polygon, in hectares (1 ha = 10,000 m²). */
 export function polygonHectares(polygon: GeoPolygon): number {

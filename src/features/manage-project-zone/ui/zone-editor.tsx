@@ -20,8 +20,8 @@ import { projectQueries, type GeoPolygon } from "@/entities/project";
 
 import { useSaveProjectZone } from "../model/hooks";
 import {
-  VN_CENTER,
-  VN_DEFAULT_ZOOM,
+  DEFAULT_CENTER,
+  DEFAULT_ZOOM,
   formatHectares,
   polygonHectares,
 } from "../lib/geo";
@@ -100,14 +100,20 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: basemapStyle(),
-      center: VN_CENTER,
-      zoom: VN_DEFAULT_ZOOM,
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
     });
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     map.addControl(new maplibregl.GeolocateControl({ trackUserLocation: false }), "bottom-right");
     mapRef.current = map;
 
+    // Surface any tile/style/worker failure to the console for diagnosis.
+    map.on("error", (e) => console.error("[zone-map] MapLibre error:", e.error ?? e));
+
     const onLoad = () => {
+      // The container may have sized after init (dynamic mount) — force a
+      // resize so the canvas fills it and tiles render.
+      map.resize();
       const draw = new TerraDraw({
         adapter: new TerraDrawMapLibreGLAdapter({ map }),
         modes: [
