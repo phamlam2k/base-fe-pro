@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Building2,
-  FolderTree,
-  Info,
-  Users,
-} from "lucide-react";
+import { Building2, FolderTree, Info, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent } from "@/shared/ui/card";
@@ -22,7 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import { CompanyStatusBadge } from "@/entities/company";
 import { CompaniesPanel } from "./companies-panel";
 import { MembersPanel } from "./members-panel";
-import { RoleLegend } from "./role-legend";
+// import { RoleLegend } from "./role-legend";
 import { StructurePanel } from "./structure-panel";
 import { useQuery } from "@tanstack/react-query";
 import { companyQueries } from "@/entities/company";
@@ -37,7 +32,9 @@ export function OrganizationView() {
   const t = useTranslations("organization");
 
   // Load all companies once to drive the picker (small dataset).
-  const companiesQuery = useQuery(companyQueries.list({ page: 1, pageSize: 100 }));
+  const companiesQuery = useQuery(
+    companyQueries.list({ page: 1, pageSize: 100 }),
+  );
   const companies = companiesQuery.data?.items ?? [];
 
   // Derive the active company during render (no effect): the user's explicit
@@ -62,10 +59,10 @@ export function OrganizationView() {
             <Building2 className="size-4" />
             {t("tabs.companies")}
           </TabsTrigger>
-          <TabsTrigger value="guide" className="gap-1.5 text-sm">
+          {/* <TabsTrigger value="guide" className="gap-1.5 text-sm">
             <Info className="size-4" />
             {t("tabs.guide")}
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         {/* Members + Structure share the company picker + summary. */}
@@ -95,9 +92,9 @@ export function OrganizationView() {
           <CompaniesPanel />
         </TabsContent>
 
-        <TabsContent value="guide">
+        {/* <TabsContent value="guide">
           <RoleLegend />
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
     </div>
   );
