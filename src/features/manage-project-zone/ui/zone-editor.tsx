@@ -241,7 +241,10 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
 
   return (
     <div className="relative h-[70vh] min-h-[420px] w-full overflow-hidden rounded-lg border">
-      <div ref={containerRef} className="absolute inset-0" />
+      {/* Fills the sized wrapper. MapLibre adds `.maplibregl-map`
+          (position: relative) to this node, so h/w-full (not absolute inset-0,
+          which that rule would override) is what keeps the canvas sized. */}
+      <div ref={containerRef} className="h-full w-full" />
 
       {/* Search — top-left */}
       <div className="absolute top-3 left-3 z-10">
