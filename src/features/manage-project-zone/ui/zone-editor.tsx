@@ -156,6 +156,18 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
                 },
               },
             },
+            // Bigger, colour-coded handles so vertices (blue) and midpoints
+            // (amber — drag to insert a point) are easy to grab and refine.
+            styles: {
+              selectionPointWidth: 7,
+              selectionPointColor: "#2563eb",
+              selectionPointOutlineColor: "#ffffff",
+              selectionPointOutlineWidth: 2,
+              midPointWidth: 5,
+              midPointColor: "#f59e0b",
+              midPointOutlineColor: "#ffffff",
+              midPointOutlineWidth: 1,
+            },
           }),
         ],
       });
