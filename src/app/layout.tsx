@@ -43,7 +43,7 @@ export default async function RootLayout({
       className={`${inter.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         <script dangerouslySetInnerHTML={{ __html: preferencesScript }} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppProviders>
