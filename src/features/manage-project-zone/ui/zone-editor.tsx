@@ -8,10 +8,31 @@ import { TerraDraw, TerraDrawPolygonMode, TerraDrawSelectMode } from "terra-draw
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
-import { Crosshair, Layers, Loader2, Plus, Save, Trash2, X } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Check,
+  Layers,
+  Loader2,
+  Pencil,
+  PenLine,
+  Plus,
+  Save,
+  Trash2,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Label } from "@/shared/ui/label";
 import { ScrollArea } from "@/shared/ui/scroll-area";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/shared/ui/dialog";
 import { cn } from "@/shared/lib/utils";
 import { projectQueries, type GeoPolygon } from "@/entities/project";
 
@@ -25,7 +46,7 @@ const OSM_STREET = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
 type Basemap = "street" | "satellite";
 type FeatureId = string | number;
-type ZoneItem = { id: FeatureId; polygon: GeoPolygon };
+type ZoneItem = { id: FeatureId; name: string; polygon: GeoPolygon };
 
 function basemapStyle(): maplibregl.StyleSpecification {
   return {
@@ -44,7 +65,6 @@ function basemapStyle(): maplibregl.StyleSpecification {
         attribution: "© OpenStreetMap contributors",
       },
     },
-    // Street is the default basemap; satellite starts hidden.
     layers: [
       { id: "satellite", type: "raster", source: "satellite", layout: { visibility: "none" } },
       { id: "street", type: "raster", source: "street" },
@@ -79,6 +99,10 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
   const containerRef = React.useRef<HTMLDivElement | null>(null);
   const mapRef = React.useRef<maplibregl.Map | null>(null);
   const drawRef = React.useRef<TerraDraw | null>(null);
+  const tRef = React.useRef(t);
+  React.useEffect(() => {
+    tRef.current = t;
+  }, [t]);
   const suppressDirty = React.useRef(false);
   const loadedRef = React.useRef(false);
 
@@ -87,6 +111,12 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
   const [basemap, setBasemap] = React.useState<Basemap>("street");
   const [zones, setZones] = React.useState<ZoneItem[]>([]);
   const [dirty, setDirty] = React.useState(false);
+
+  // Inline rename + save dialog state.
+  const [editingId, setEditingId] = React.useState<FeatureId | null>(null);
+  const [editingName, setEditingName] = React.useState("");
+  const [saveOpen, setSaveOpen] = React.useState(false);
+  const [draft, setDraft] = React.useState<Record<string, string>>({});
 
   const zoomTo = (polygon: GeoPolygon) =>
     mapRef.current?.fitBounds(boundsOf(polygon), { padding: 60, maxZoom: 16 });
@@ -126,11 +156,15 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
       draw.start();
       draw.setMode("select");
 
+      // A zone is a *named* polygon; in-progress (unnamed) drawing is excluded.
       const reconcile = (markDirty: boolean) => {
-        const polys = draw.getSnapshot().filter((f) => f.geometry?.type === "Polygon");
+        const named = draw
+          .getSnapshot()
+          .filter((f) => f.geometry?.type === "Polygon" && f.properties?.name);
         setZones(
-          polys.map((f) => ({
+          named.map((f) => ({
             id: f.id as FeatureId,
+            name: String(f.properties.name),
             polygon: f.geometry as unknown as GeoPolygon,
           })),
         );
@@ -141,7 +175,12 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
         reconcile(!suppressDirty.current);
         suppressDirty.current = false;
       });
-      draw.on("finish", () => {
+      draw.on("finish", (id) => {
+        // Auto-name the just-drawn polygon (user can rename in the list / on save).
+        const count = draw.getSnapshot().filter((f) => f.geometry?.type === "Polygon").length;
+        draw.updateFeatureProperties(id, {
+          name: tRef.current("list.defaultName", { index: count }),
+        });
         setDrawing(false);
         draw.setMode("select");
       });
@@ -159,26 +198,25 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
       setReady(false);
       loadedRef.current = false;
     };
-    // Map created once; basemap changes are applied via layer visibility.
   }, []);
 
-  // --- Load saved zones once (after map ready + data), zoom to the first -----
+  // --- Load saved zones once, zoom to the first ------------------------------
   React.useEffect(() => {
     const draw = drawRef.current;
     if (!ready || !draw || loadedRef.current) return;
     loadedRef.current = true;
-    const saved = zonesQuery.data?.polygons ?? [];
+    const saved = zonesQuery.data?.zones ?? [];
     if (saved.length) {
       suppressDirty.current = true;
       draw.addFeatures(
-        saved.map((polygon) => ({
+        saved.map((z) => ({
           type: "Feature",
-          geometry: polygon,
-          properties: { mode: "polygon" },
+          geometry: z.polygon,
+          properties: { mode: "polygon", name: z.name },
         })) as Parameters<typeof draw.addFeatures>[0],
       );
       draw.setMode("select");
-      zoomTo(saved[0]); // default view = first drawn zone
+      zoomTo(saved[0].polygon);
     }
   }, [ready, zonesQuery.data]);
 
@@ -192,20 +230,40 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
 
   // --- Actions ---------------------------------------------------------------
   const startDrawing = () => {
-    const draw = drawRef.current;
-    if (!draw) return;
-    draw.setMode("polygon");
+    drawRef.current?.setMode("polygon");
     setDrawing(true);
   };
   const cancelDrawing = () => {
     drawRef.current?.setMode("select");
     setDrawing(false);
   };
-  const removeZone = (id: FeatureId) => {
+  const removeZone = (id: FeatureId) =>
     drawRef.current?.removeFeatures([id] as Parameters<
       NonNullable<typeof drawRef.current>["removeFeatures"]
     >[0]);
+
+  const renameZone = (id: FeatureId, name: string) => {
+    const draw = drawRef.current;
+    if (!draw) return;
+    const clean = name.trim();
+    if (clean) draw.updateFeatureProperties(id, { name: clean });
+    setEditingId(null);
   };
+
+  const editPolygon = (zone: ZoneItem) => {
+    const draw = drawRef.current;
+    if (!draw) return;
+    draw.setMode("select");
+    setDrawing(false);
+    zoomTo(zone.polygon);
+    try {
+      draw.selectFeature(zone.id);
+    } catch {
+      /* selection is best-effort */
+    }
+    toast.info(t("editPolygonHint"));
+  };
+
   const handleLocate = (center: [number, number], bbox: [number, number, number, number] | null) => {
     const map = mapRef.current;
     if (!map) return;
@@ -222,6 +280,30 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
     }
   };
 
+  const openSave = () => {
+    if (zones.length === 0) {
+      save.mutate([], { onSuccess: () => setDirty(false) });
+      return;
+    }
+    setDraft(Object.fromEntries(zones.map((z) => [String(z.id), z.name])));
+    setSaveOpen(true);
+  };
+  const confirmSave = () => {
+    const draw = drawRef.current;
+    const payload = zones.map((z) => {
+      const name = (draft[String(z.id)] ?? z.name).trim();
+      if (draw && name && name !== z.name) draw.updateFeatureProperties(z.id, { name });
+      return { name, polygon: z.polygon };
+    });
+    save.mutate(payload, {
+      onSuccess: () => {
+        setDirty(false);
+        setSaveOpen(false);
+      },
+    });
+  };
+  const draftHasEmpty = zones.some((z) => !(draft[String(z.id)] ?? z.name).trim());
+
   const totalHa = zones.reduce((sum, z) => {
     try {
       return sum + polygonHectares(z.polygon);
@@ -232,8 +314,6 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
 
   return (
     <div className="relative h-[70vh] min-h-[420px] w-full overflow-hidden rounded-lg border">
-      {/* MapLibre adds `.maplibregl-map` (position: relative) to this node, so
-          h/w-full (not absolute inset-0, which that rule would override). */}
       <div ref={containerRef} className="h-full w-full" />
 
       {/* Search — top-left */}
@@ -256,53 +336,90 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
       </div>
 
       {/* Zone list — right column */}
-      <div className="absolute top-14 right-3 z-10 w-64">
+      <div className="absolute top-14 right-3 z-10 w-72">
         <div className="bg-background/95 rounded-lg border shadow-lg backdrop-blur">
-          <div className="flex items-center justify-between px-3 py-2">
-            <span className="text-sm font-medium">
-              {t("list.title", { count: zones.length })}
-            </span>
+          <div className="px-3 py-2 text-sm font-medium">
+            {t("list.title", { count: zones.length })}
           </div>
-          <ScrollArea className="max-h-56">
+          <ScrollArea className="max-h-64">
             {zones.length === 0 ? (
               <p className="text-muted-foreground px-3 pb-3 text-xs">{t("list.empty")}</p>
             ) : (
               <ul className="grid gap-1 px-2 pb-2">
-                {zones.map((zone, i) => (
+                {zones.map((zone) => (
                   <li
                     key={String(zone.id)}
                     className="hover:bg-accent flex items-center gap-1 rounded-md px-2 py-1.5"
                   >
-                    <button
-                      type="button"
-                      className="grid flex-1 text-left"
-                      onClick={() => zoomTo(zone.polygon)}
-                    >
-                      <span className="text-sm font-medium">
-                        {t("list.item", { index: i + 1 })}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        {formatHectares(polygonHectares(zone.polygon))}
-                      </span>
-                    </button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={t("list.zoom")}
-                      onClick={() => zoomTo(zone.polygon)}
-                    >
-                      <Crosshair />
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={t("clear")}
-                      onClick={() => removeZone(zone.id)}
-                    >
-                      <Trash2 className="text-destructive" />
-                    </Button>
+                    {editingId === zone.id ? (
+                      <Input
+                        autoFocus
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onBlur={() => renameZone(zone.id, editingName)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") renameZone(zone.id, editingName);
+                          if (e.key === "Escape") setEditingId(null);
+                        }}
+                        className="h-7 flex-1"
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        className="grid flex-1 text-left"
+                        onClick={() => zoomTo(zone.polygon)}
+                      >
+                        <span className="truncate text-sm font-medium">{zone.name}</span>
+                        <span className="text-muted-foreground text-xs">
+                          {formatHectares(polygonHectares(zone.polygon))}
+                        </span>
+                      </button>
+                    )}
+                    {editingId === zone.id ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("saveDialog.confirm")}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => renameZone(zone.id, editingName)}
+                      >
+                        <Check />
+                      </Button>
+                    ) : (
+                      <>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("list.rename")}
+                          onClick={() => {
+                            setEditingId(zone.id);
+                            setEditingName(zone.name);
+                          }}
+                        >
+                          <Pencil />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("list.editShape")}
+                          onClick={() => editPolygon(zone)}
+                        >
+                          <PenLine />
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={t("clear")}
+                          onClick={() => removeZone(zone.id)}
+                        >
+                          <Trash2 className="text-destructive" />
+                        </Button>
+                      </>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -353,12 +470,7 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
             <Button
               type="button"
               size="sm"
-              onClick={() =>
-                save.mutate(
-                  zones.map((z) => z.polygon),
-                  { onSuccess: () => setDirty(false) },
-                )
-              }
+              onClick={openSave}
               disabled={!dirty || save.isPending || drawing}
               className={cn(!dirty && "opacity-60")}
             >
@@ -368,6 +480,46 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
           </div>
         </div>
       </div>
+
+      {/* Save dialog — name each zone before persisting */}
+      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("saveDialog.title")}</DialogTitle>
+            <DialogDescription>{t("saveDialog.description")}</DialogDescription>
+          </DialogHeader>
+          <div className="grid max-h-72 gap-3 overflow-auto">
+            {zones.map((zone, i) => (
+              <div key={String(zone.id)} className="grid gap-1.5">
+                <Label className="text-muted-foreground text-xs">
+                  {t("list.item", { index: i + 1 })} ·{" "}
+                  {formatHectares(polygonHectares(zone.polygon))}
+                </Label>
+                <Input
+                  value={draft[String(zone.id)] ?? zone.name}
+                  onChange={(e) =>
+                    setDraft((d) => ({ ...d, [String(zone.id)]: e.target.value }))
+                  }
+                  placeholder={t("saveDialog.namePlaceholder")}
+                />
+              </div>
+            ))}
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setSaveOpen(false)}>
+              {t("draw.cancel")}
+            </Button>
+            <Button
+              type="button"
+              onClick={confirmSave}
+              disabled={draftHasEmpty || save.isPending}
+            >
+              {save.isPending ? <Loader2 className="animate-spin" /> : null}
+              {t("saveDialog.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

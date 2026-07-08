@@ -599,7 +599,10 @@
       "title": "Zones ({count})",
       "empty": "No zone yet.",
       "item": "Zone {index}",
-      "zoom": "Zoom to zone"
+      "zoom": "Zoom to zone",
+      "defaultName": "Zone {index}",
+      "rename": "Rename",
+      "editShape": "Edit shape"
     },
     "empty": {
       "title": "No zone yet",
@@ -619,6 +622,13 @@
     "unsaved": "unsaved",
     "toasts": {
       "saved": "Zones saved"
+    },
+    "editPolygonHint": "Drag the points to adjust the shape.",
+    "saveDialog": {
+      "title": "Name & save zones",
+      "description": "Give each zone a name, then save.",
+      "confirm": "Save",
+      "namePlaceholder": "Zone name…"
     }
   }
 }

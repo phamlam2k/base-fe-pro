@@ -9,7 +9,7 @@ import "server-only";
  * unchanged. Cached on `globalThis` so it survives HMR in dev.
  */
 interface StoredZone {
-  polygons: unknown[];
+  zones: unknown[];
   updatedAt: string | null;
 }
 

@@ -12,5 +12,6 @@ export type {
   ProjectStatus,
   ProjectFormValues,
   GeoPolygon,
+  ProjectZoneItem,
   ProjectZones,
 } from "./model/project";

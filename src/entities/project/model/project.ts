@@ -37,9 +37,14 @@ export interface GeoPolygon {
   coordinates: [number, number][][];
 }
 
+export interface ProjectZoneItem {
+  name: string;
+  polygon: GeoPolygon;
+}
+
 export interface ProjectZones {
   projectId: string;
-  polygons: GeoPolygon[];
+  zones: ProjectZoneItem[];
   updatedAt: string | null;
 }
 
@@ -49,4 +54,6 @@ export const geoPolygonSchema = z.object({
   // Each linear ring needs ≥4 positions (a triangle + the closing point).
   coordinates: z.array(geoPositionSchema.array().min(4)).min(1),
 });
-export const projectZonesSchema = z.object({ polygons: z.array(geoPolygonSchema) });
+export const projectZonesSchema = z.object({
+  zones: z.array(z.object({ name: z.string().min(1), polygon: geoPolygonSchema })),
+});

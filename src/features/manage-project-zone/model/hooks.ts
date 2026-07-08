@@ -4,14 +4,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
-import { projectApi, projectQueries, type GeoPolygon } from "@/entities/project";
+import {
+  projectApi,
+  projectQueries,
+  type ProjectZoneItem,
+} from "@/entities/project";
 
-/** Save the full list of a project's site boundaries. */
+/** Save the full list of a project's named site boundaries. */
 export function useSaveProjectZones(projectId: string) {
   const qc = useQueryClient();
   const t = useTranslations("projectZone");
   return useMutation({
-    mutationFn: (polygons: GeoPolygon[]) => projectApi.saveZones(projectId, polygons),
+    mutationFn: (zones: ProjectZoneItem[]) => projectApi.saveZones(projectId, zones),
     onSuccess: () => {
       toast.success(t("toasts.saved"));
       qc.invalidateQueries({ queryKey: projectQueries.zones(projectId).queryKey });

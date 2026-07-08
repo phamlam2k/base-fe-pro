@@ -599,7 +599,10 @@
       "title": "Danh sách vùng ({count})",
       "empty": "Chưa có vùng nào.",
       "item": "Vùng {index}",
-      "zoom": "Phóng tới vùng"
+      "zoom": "Phóng tới vùng",
+      "defaultName": "Vùng {index}",
+      "rename": "Đổi tên",
+      "editShape": "Sửa vùng"
     },
     "empty": {
       "title": "Chưa có vùng",
@@ -619,6 +622,13 @@
     "unsaved": "chưa lưu",
     "toasts": {
       "saved": "Đã lưu các vùng"
+    },
+    "editPolygonHint": "Kéo các đỉnh để chỉnh vùng.",
+    "saveDialog": {
+      "title": "Đặt tên & lưu vùng",
+      "description": "Đặt tên cho từng vùng rồi lưu.",
+      "confirm": "Lưu",
+      "namePlaceholder": "Tên vùng…"
     }
   }
 }

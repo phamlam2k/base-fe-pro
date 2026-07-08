@@ -21,7 +21,7 @@ function readMock(id: string): ProjectZones {
   const stored = getProjectZonesDb().get(id);
   return {
     projectId: id,
-    polygons: (stored?.polygons as ProjectZones["polygons"]) ?? [],
+    zones: (stored?.zones as ProjectZones["zones"]) ?? [],
     updatedAt: stored?.updatedAt ?? null,
   };
 }
@@ -50,20 +50,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   const { id } = await params;
   const parsed = projectZonesSchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return jsonError(422, "VALIDATION", "Danh sách vùng không hợp lệ (GeoJSON Polygon).");
+    return jsonError(422, "VALIDATION", "Danh sách vùng không hợp lệ (tên + GeoJSON Polygon).");
   }
-  const { polygons } = parsed.data;
+  const { zones } = parsed.data;
 
   const writeMock = (): ProjectZones => {
     const updatedAt = new Date().toISOString();
-    getProjectZonesDb().set(id, { polygons, updatedAt });
-    return { projectId: id, polygons, updatedAt };
+    getProjectZonesDb().set(id, { zones, updatedAt });
+    return { projectId: id, zones, updatedAt };
   };
 
   try {
     const res = await callBackend<ProjectZones>(`/rbac-projects/${id}/zone/`, {
       method: "PATCH",
-      body: { polygons },
+      body: { zones },
     });
     if (res.ok) return jsonData(res.data);
     if (res.status === 404) return jsonData(writeMock());

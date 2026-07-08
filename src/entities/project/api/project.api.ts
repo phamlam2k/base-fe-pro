@@ -2,9 +2,9 @@ import { apiClient } from "@/shared/api/axios";
 import type { ApiResponse } from "@/shared/api/types";
 
 import type {
-  GeoPolygon,
   Project,
   ProjectFormValues,
+  ProjectZoneItem,
   ProjectZones,
 } from "@/entities/project/model/project";
 
@@ -41,10 +41,10 @@ export const projectApi = {
     );
     return res.data.data;
   },
-  saveZones: async (id: string, polygons: GeoPolygon[]): Promise<ProjectZones> => {
+  saveZones: async (id: string, zones: ProjectZoneItem[]): Promise<ProjectZones> => {
     const res = await apiClient.patch<ApiResponse<ProjectZones>>(
       `/organization/projects/${id}/zone`,
-      { polygons },
+      { zones },
     );
     return res.data.data;
   },
