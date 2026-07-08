@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Building2, FolderTree, Info, Users } from "lucide-react";
+import { Building2, FolderTree, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Card, CardContent } from "@/shared/ui/card";
