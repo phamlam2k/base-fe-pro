@@ -429,7 +429,8 @@
       "edit": "Edit project",
       "delete": "Delete project",
       "deleteTitle": "Delete project {name}?",
-      "deleteDescription": "All teams and data in this project will be deleted. This cannot be undone."
+      "deleteDescription": "All teams and data in this project will be deleted. This cannot be undone.",
+      "zone": "Zone"
     },
     "teams": {
       "title": "Team tree in the project",
@@ -582,6 +583,38 @@
       "searchPlaceholder": "Search by name or email...",
       "loading": "Searching...",
       "empty": "No users found. Create one in User management."
+    }
+  },
+  "projectZone": {
+    "title": "Project zone",
+    "titleFor": "Zone — {name}",
+    "description": "Draw the site boundary on the map. Mobile uses it to check that site photos were taken inside the area.",
+    "back": "Back",
+    "searchPlaceholder": "Search a road, ward or place…",
+    "basemap": {
+      "satellite": "Satellite",
+      "street": "Street map"
+    },
+    "empty": {
+      "title": "No boundary yet",
+      "step1": "① Search the area",
+      "step2": "② Tap around the boundary",
+      "step3": "③ Save"
+    },
+    "draw": {
+      "start": "Draw boundary",
+      "hint": "Click each point around the site. Click the first point to close the area.",
+      "cancel": "Cancel"
+    },
+    "redraw": "Redraw",
+    "clear": "Clear",
+    "save": "Save boundary",
+    "saving": "Saving…",
+    "area": "Area: {value}",
+    "unsaved": "unsaved",
+    "editHint": "Drag the points to adjust.",
+    "toasts": {
+      "saved": "Boundary saved"
     }
   }
 }

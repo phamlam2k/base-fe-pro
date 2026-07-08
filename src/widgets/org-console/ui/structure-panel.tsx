@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import {
   CornerDownRight,
   FolderTree,
+  MapPin,
   Pencil,
   Plus,
   Trash2,
@@ -13,6 +15,7 @@ import {
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/shared/ui/button";
+import { ROUTES } from "@/shared/config/routes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import {
@@ -74,6 +77,16 @@ export function StructurePanel({ companyId }: { companyId: string }) {
 
         {selectedProject ? (
           <PermissionGate permission="orgs:manage">
+            <PermissionGate permission="projects:manage-zone">
+              <Button asChild variant="ghost" size="sm" aria-label={t("projects.zone")}>
+                <Link
+                  href={`${ROUTES.projectZone(selectedProject.id)}?name=${encodeURIComponent(selectedProject.name)}`}
+                >
+                  <MapPin />
+                  {t("projects.zone")}
+                </Link>
+              </Button>
+            </PermissionGate>
             <Button
               variant="ghost"
               size="icon-sm"

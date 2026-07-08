@@ -15,7 +15,11 @@ export const ROUTES = {
   wizardExample: "/examples/wizard",
   settingsAppearance: "/settings/appearance",
   settingsProfile: "/settings/profile",
+  projectZone: (id: string) => `/projects/${id}/zone`,
 } as const;
+
+/** Route prefix used for permission matching (see ROUTE_PERMISSIONS). */
+export const PROJECTS_PREFIX = "/projects";
 
 /** Routes reachable without a session. */
 export const PUBLIC_ROUTES: readonly string[] = [ROUTES.login];
@@ -30,6 +34,7 @@ export const ROUTE_PERMISSIONS: ReadonlyArray<{
 }> = [
   { prefix: ROUTES.users, permission: "users:view" },
   { prefix: ROUTES.organization, permission: "orgs:view" },
+  { prefix: PROJECTS_PREFIX, permission: "projects:manage-zone" },
   { prefix: ROUTES.dashboard, permission: "dashboard:view" },
 ];
 

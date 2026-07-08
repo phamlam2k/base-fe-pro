@@ -429,7 +429,8 @@
       "edit": "Sửa dự án",
       "delete": "Xóa dự án",
       "deleteTitle": "Xóa dự án {name}?",
-      "deleteDescription": "Toàn bộ nhóm và dữ liệu trong dự án sẽ bị xóa. Không thể hoàn tác."
+      "deleteDescription": "Toàn bộ nhóm và dữ liệu trong dự án sẽ bị xóa. Không thể hoàn tác.",
+      "zone": "Khoanh vùng"
     },
     "teams": {
       "title": "Cây nhóm trong dự án",
@@ -582,6 +583,38 @@
       "searchPlaceholder": "Tìm theo tên hoặc email...",
       "loading": "Đang tìm...",
       "empty": "Không tìm thấy người dùng. Hãy tạo ở trang Quản lý người dùng."
+    }
+  },
+  "projectZone": {
+    "title": "Khoanh vùng dự án",
+    "titleFor": "Khoanh vùng — {name}",
+    "description": "Vẽ ranh giới khu vực dự án trên bản đồ. App mobile dùng vùng này để kiểm tra ảnh hiện trường có được chụp trong khu vực hay không.",
+    "back": "Quay lại",
+    "searchPlaceholder": "Tìm đường, phường/xã hoặc địa điểm…",
+    "basemap": {
+      "satellite": "Vệ tinh",
+      "street": "Bản đồ đường"
+    },
+    "empty": {
+      "title": "Chưa có vùng",
+      "step1": "① Tìm khu vực",
+      "step2": "② Chạm quanh ranh giới",
+      "step3": "③ Lưu"
+    },
+    "draw": {
+      "start": "Vẽ vùng",
+      "hint": "Nhấp từng điểm quanh khu vực. Nhấp vào điểm đầu tiên để đóng vùng.",
+      "cancel": "Huỷ"
+    },
+    "redraw": "Vẽ lại",
+    "clear": "Xoá vùng",
+    "save": "Lưu vùng",
+    "saving": "Đang lưu…",
+    "area": "Diện tích: {value}",
+    "unsaved": "chưa lưu",
+    "editHint": "Kéo các điểm để chỉnh.",
+    "toasts": {
+      "saved": "Đã lưu vùng"
     }
   }
 }

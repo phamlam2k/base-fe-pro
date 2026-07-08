@@ -1,7 +1,12 @@
 import { apiClient } from "@/shared/api/axios";
 import type { ApiResponse } from "@/shared/api/types";
 
-import type { Project, ProjectFormValues } from "@/entities/project/model/project";
+import type {
+  GeoPolygon,
+  Project,
+  ProjectFormValues,
+  ProjectZone,
+} from "@/entities/project/model/project";
 
 /** Raw HTTP calls for the Project entity. */
 export const projectApi = {
@@ -27,5 +32,20 @@ export const projectApi = {
   },
   remove: async (id: string): Promise<void> => {
     await apiClient.delete(`/organization/projects/${id}`);
+  },
+
+  // --- Zone (site boundary) --------------------------------------------------
+  getZone: async (id: string): Promise<ProjectZone> => {
+    const res = await apiClient.get<ApiResponse<ProjectZone>>(
+      `/organization/projects/${id}/zone`,
+    );
+    return res.data.data;
+  },
+  saveZone: async (id: string, polygon: GeoPolygon | null): Promise<ProjectZone> => {
+    const res = await apiClient.patch<ApiResponse<ProjectZone>>(
+      `/organization/projects/${id}/zone`,
+      { polygon },
+    );
+    return res.data.data;
   },
 };

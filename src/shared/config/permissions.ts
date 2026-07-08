@@ -30,6 +30,8 @@ export const PERMISSIONS = [
   "users:delete",
   "orgs:view",
   "orgs:manage",
+  // Draw/edit a project's map boundary — SuperAdmin (admin) only.
+  "projects:manage-zone",
   "settings:view",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
