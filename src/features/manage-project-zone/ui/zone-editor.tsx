@@ -145,8 +145,14 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
             flags: {
               polygon: {
                 feature: {
+                  // Move the whole zone…
                   draggable: true,
-                  coordinates: { midpoints: true, draggable: true, deletable: true },
+                  coordinates: {
+                    // …or drag individual corners, add midpoints, delete corners.
+                    draggable: true,
+                    midpoints: { draggable: true },
+                    deletable: true,
+                  },
                 },
               },
             },
