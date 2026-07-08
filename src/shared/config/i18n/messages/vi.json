@@ -586,14 +586,20 @@
     }
   },
   "projectZone": {
-    "title": "Khoanh vùng dự án",
-    "titleFor": "Khoanh vùng — {name}",
-    "description": "Vẽ ranh giới khu vực dự án trên bản đồ. App mobile dùng vùng này để kiểm tra ảnh hiện trường có được chụp trong khu vực hay không.",
+    "title": "Khu vực dự án",
+    "titleFor": "Khu vực — {name}",
+    "description": "Vẽ ranh giới các khu vực dự án trên bản đồ. App mobile dùng để kiểm tra ảnh hiện trường có chụp trong khu vực hay không. Một dự án có thể có nhiều vùng.",
     "back": "Quay lại",
     "searchPlaceholder": "Tìm đường, phường/xã hoặc địa điểm…",
     "basemap": {
       "satellite": "Vệ tinh",
       "street": "Bản đồ đường"
+    },
+    "list": {
+      "title": "Danh sách vùng ({count})",
+      "empty": "Chưa có vùng nào.",
+      "item": "Vùng {index}",
+      "zoom": "Phóng tới vùng"
     },
     "empty": {
       "title": "Chưa có vùng",
@@ -602,19 +608,17 @@
       "step3": "③ Lưu"
     },
     "draw": {
-      "start": "Vẽ vùng",
+      "start": "Vẽ vùng mới",
       "hint": "Nhấp từng điểm quanh khu vực. Nhấp vào điểm đầu tiên để đóng vùng.",
       "cancel": "Huỷ"
     },
-    "redraw": "Vẽ lại",
-    "clear": "Xoá vùng",
-    "save": "Lưu vùng",
+    "clear": "Xoá",
+    "save": "Lưu",
     "saving": "Đang lưu…",
-    "area": "Diện tích: {value}",
+    "total": "Tổng diện tích: {value}",
     "unsaved": "chưa lưu",
-    "editHint": "Kéo các điểm để chỉnh.",
     "toasts": {
-      "saved": "Đã lưu vùng"
+      "saved": "Đã lưu các vùng"
     }
   }
 }

@@ -5,7 +5,7 @@ import type {
   GeoPolygon,
   Project,
   ProjectFormValues,
-  ProjectZone,
+  ProjectZones,
 } from "@/entities/project/model/project";
 
 /** Raw HTTP calls for the Project entity. */
@@ -34,17 +34,17 @@ export const projectApi = {
     await apiClient.delete(`/organization/projects/${id}`);
   },
 
-  // --- Zone (site boundary) --------------------------------------------------
-  getZone: async (id: string): Promise<ProjectZone> => {
-    const res = await apiClient.get<ApiResponse<ProjectZone>>(
+  // --- Zones (site boundaries) -----------------------------------------------
+  getZones: async (id: string): Promise<ProjectZones> => {
+    const res = await apiClient.get<ApiResponse<ProjectZones>>(
       `/organization/projects/${id}/zone`,
     );
     return res.data.data;
   },
-  saveZone: async (id: string, polygon: GeoPolygon | null): Promise<ProjectZone> => {
-    const res = await apiClient.patch<ApiResponse<ProjectZone>>(
+  saveZones: async (id: string, polygons: GeoPolygon[]): Promise<ProjectZones> => {
+    const res = await apiClient.patch<ApiResponse<ProjectZones>>(
       `/organization/projects/${id}/zone`,
-      { polygon },
+      { polygons },
     );
     return res.data.data;
   },

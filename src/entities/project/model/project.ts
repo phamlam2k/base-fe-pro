@@ -26,18 +26,20 @@ export function createProjectFormSchema(t?: TFn) {
 export type ProjectFormValues = z.infer<ReturnType<typeof createProjectFormSchema>>;
 
 /**
- * Project zone — the geographic boundary of a site, stored as a GeoJSON
- * Polygon (RFC 7946: rings of `[lng, lat]` positions, outer ring first,
- * closed). Mobile uses it for a point-in-polygon GPS check on site photos.
+ * Project zones — the geographic boundaries of a site. A project can have
+ * SEVERAL disjoint areas, stored as a list of GeoJSON Polygons (RFC 7946:
+ * rings of `[lng, lat]`, outer ring first, closed). Mobile checks a site
+ * photo's GPS against ANY of them. Display names ("Vùng 1..N") are derived
+ * from order — not stored.
  */
 export interface GeoPolygon {
   type: "Polygon";
   coordinates: [number, number][][];
 }
 
-export interface ProjectZone {
+export interface ProjectZones {
   projectId: string;
-  polygon: GeoPolygon | null;
+  polygons: GeoPolygon[];
   updatedAt: string | null;
 }
 
@@ -47,4 +49,4 @@ export const geoPolygonSchema = z.object({
   // Each linear ring needs ≥4 positions (a triangle + the closing point).
   coordinates: z.array(geoPositionSchema.array().min(4)).min(1),
 });
-export const projectZoneSchema = z.object({ polygon: geoPolygonSchema.nullable() });
+export const projectZonesSchema = z.object({ polygons: z.array(geoPolygonSchema) });

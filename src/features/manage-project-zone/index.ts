@@ -1,3 +1,3 @@
-/** Public API of the `manage-project-zone` feature (draw a project's site boundary). */
+/** Public API of the `manage-project-zone` feature (draw a project's site boundaries). */
 export { ZoneEditor } from "./ui/zone-editor-mount";
-export { useSaveProjectZone } from "./model/hooks";
+export { useSaveProjectZones } from "./model/hooks";

@@ -14,11 +14,11 @@ export const projectQueries = {
       enabled: Boolean(companyId),
     }),
 
-  zones: () => [...projectQueries.all(), "zone"] as const,
-  zone: (id: string) =>
+  zoneKeys: () => [...projectQueries.all(), "zone"] as const,
+  zones: (id: string) =>
     queryOptions({
-      queryKey: [...projectQueries.zones(), id],
-      queryFn: () => projectApi.getZone(id),
+      queryKey: [...projectQueries.zoneKeys(), id],
+      queryFn: () => projectApi.getZones(id),
       enabled: Boolean(id),
     }),
 };

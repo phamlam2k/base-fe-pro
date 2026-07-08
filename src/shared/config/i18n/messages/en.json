@@ -586,35 +586,39 @@
     }
   },
   "projectZone": {
-    "title": "Project zone",
-    "titleFor": "Zone — {name}",
-    "description": "Draw the site boundary on the map. Mobile uses it to check that site photos were taken inside the area.",
+    "title": "Project zones",
+    "titleFor": "Zones — {name}",
+    "description": "Draw the site boundaries on the map. Mobile uses them to check that site photos were taken inside an area. A project can have several zones.",
     "back": "Back",
     "searchPlaceholder": "Search a road, ward or place…",
     "basemap": {
       "satellite": "Satellite",
       "street": "Street map"
     },
+    "list": {
+      "title": "Zones ({count})",
+      "empty": "No zone yet.",
+      "item": "Zone {index}",
+      "zoom": "Zoom to zone"
+    },
     "empty": {
-      "title": "No boundary yet",
+      "title": "No zone yet",
       "step1": "① Search the area",
       "step2": "② Tap around the boundary",
       "step3": "③ Save"
     },
     "draw": {
-      "start": "Draw boundary",
+      "start": "Add zone",
       "hint": "Click each point around the site. Click the first point to close the area.",
       "cancel": "Cancel"
     },
-    "redraw": "Redraw",
-    "clear": "Clear",
-    "save": "Save boundary",
+    "clear": "Delete",
+    "save": "Save",
     "saving": "Saving…",
-    "area": "Area: {value}",
+    "total": "Total area: {value}",
     "unsaved": "unsaved",
-    "editHint": "Drag the points to adjust.",
     "toasts": {
-      "saved": "Boundary saved"
+      "saved": "Zones saved"
     }
   }
 }

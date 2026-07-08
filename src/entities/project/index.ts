@@ -5,12 +5,12 @@ export {
   PROJECT_STATUSES,
   createProjectFormSchema,
   geoPolygonSchema,
-  projectZoneSchema,
+  projectZonesSchema,
 } from "./model/project";
 export type {
   Project,
   ProjectStatus,
   ProjectFormValues,
   GeoPolygon,
-  ProjectZone,
+  ProjectZones,
 } from "./model/project";

@@ -6,15 +6,15 @@ import { toast } from "sonner";
 
 import { projectApi, projectQueries, type GeoPolygon } from "@/entities/project";
 
-/** Save (or clear) a project's site boundary. */
-export function useSaveProjectZone(projectId: string) {
+/** Save the full list of a project's site boundaries. */
+export function useSaveProjectZones(projectId: string) {
   const qc = useQueryClient();
   const t = useTranslations("projectZone");
   return useMutation({
-    mutationFn: (polygon: GeoPolygon | null) => projectApi.saveZone(projectId, polygon),
+    mutationFn: (polygons: GeoPolygon[]) => projectApi.saveZones(projectId, polygons),
     onSuccess: () => {
       toast.success(t("toasts.saved"));
-      qc.invalidateQueries({ queryKey: projectQueries.zone(projectId).queryKey });
+      qc.invalidateQueries({ queryKey: projectQueries.zones(projectId).queryKey });
     },
     onError: (error) => toast.error(error.message),
   });
