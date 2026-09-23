@@ -8,6 +8,7 @@ export function createLoginSchema(t?: TFn) {
   return z.object({
     email: z
       .string()
+      .trim()
       .min(1, { message: msg("validation.emailRequired", "Email is required") })
       .pipe(
         z.email({

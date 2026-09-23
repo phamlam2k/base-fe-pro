@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
@@ -27,7 +27,10 @@ import {
 import { Input } from "@/shared/ui/input";
 import { isApiError } from "@/shared/api/axios";
 import { useLogin } from "@/features/auth-by-credentials/model/hooks";
-import { createLoginSchema, type LoginValues } from "@/features/auth-by-credentials/model/schemas";
+import {
+  createLoginSchema,
+  type LoginValues,
+} from "@/features/auth-by-credentials/model/schemas";
 
 const DEMO_ACCOUNTS = [
   { email: "admin@acme.io", role: "Admin" },
@@ -40,6 +43,8 @@ export function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? undefined;
   const login = useLogin(redirectTo);
+
+  const [showPassword, setShowPassword] = React.useState(false);
 
   const schema = React.useMemo(() => createLoginSchema(t), [t]);
   const form = useForm<LoginValues>({
@@ -55,10 +60,14 @@ export function LoginForm() {
     login.error && isApiError(login.error) ? login.error.message : null;
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>{t("loginTitle")}</CardTitle>
-        <CardDescription>{t("loginSubtitle")}</CardDescription>
+    <Card className="border-border/60 w-full max-w-sm shadow-xl">
+      <CardHeader className="text-center">
+        <CardTitle className="text-primary text-2xl font-semibold">
+          {t("loginTitle")}
+        </CardTitle>
+        <CardDescription className="text-muted-foreground">
+          {t("loginSubtitle")}
+        </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-6">
         <Form {...form}>
@@ -92,11 +101,29 @@ export function LoginForm() {
                 <FormItem>
                   <FormLabel>{t("password")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      autoComplete="current-password"
-                      {...field}
-                    />
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="current-password"
+                        className="pr-10"
+                        {...field}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        tabIndex={-1}
+                        aria-label={
+                          showPassword ? t("hidePassword") : t("showPassword")
+                        }
+                        className="text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center pr-3"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="size-4" />
+                        ) : (
+                          <Eye className="size-4" />
+                        )}
+                      </button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,29 +148,6 @@ export function LoginForm() {
             </Button>
           </form>
         </Form>
-
-        <div className="text-muted-foreground text-sm">
-          <p className="mb-2 font-medium">
-            {t("demoAccounts", { password: "Demo@123" })}
-          </p>
-          <ul className="grid gap-1">
-            {DEMO_ACCOUNTS.map((account) => (
-              <li key={account.email}>
-                <button
-                  type="button"
-                  className="hover:text-foreground underline underline-offset-4"
-                  onClick={() => {
-                    form.setValue("email", account.email);
-                    form.setValue("password", "Demo@123");
-                  }}
-                >
-                  {account.email}
-                </button>{" "}
-                — {account.role}
-              </li>
-            ))}
-          </ul>
-        </div>
       </CardContent>
     </Card>
   );
