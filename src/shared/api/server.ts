@@ -2,7 +2,7 @@ import "server-only";
 
 import { NextResponse, type NextRequest } from "next/server";
 
-import { can, type Permission } from "@/shared/config/permissions";
+import { can, canAny, type Permission } from "@/shared/config/permissions";
 import { AUTH_COOKIE, decodeSessionToken } from "@/shared/lib/auth/token";
 import type { SessionUser } from "@/shared/lib/auth/session";
 import type { ApiErrorBody, ApiResponse } from "@/shared/api/types";
@@ -31,7 +31,8 @@ export function jsonError(
  */
 export function requireAuth(
   request: NextRequest,
-  permission?: Permission,
+  // 1 permission, hoặc MẢNG (thoả 1 trong số là đủ — any-of).
+  permission?: Permission | readonly Permission[],
 ): { user: SessionUser } | { response: NextResponse } {
   const payload = decodeSessionToken(request.cookies.get(AUTH_COOKIE)?.value);
   if (!payload) {
@@ -39,12 +40,17 @@ export function requireAuth(
       response: jsonError(401, "UNAUTHENTICATED", "Authentication required."),
     };
   }
-  if (permission && !can(payload.role, permission)) {
+  const ok = permission
+    ? Array.isArray(permission)
+      ? canAny(payload.role, permission)
+      : can(payload.role, permission as Permission)
+    : true;
+  if (!ok) {
     return {
       response: jsonError(
         403,
         "FORBIDDEN",
-        `Missing permission: ${permission}`,
+        `Missing permission: ${Array.isArray(permission) ? permission.join("|") : permission}`,
       ),
     };
   }
@@ -54,6 +60,8 @@ export function requireAuth(
       email: payload.email,
       name: payload.name,
       role: payload.role,
+      madokaRole: payload.madokaRole ?? "",
+      mustChangePassword: payload.mustChangePassword ?? false,
     },
   };
 }

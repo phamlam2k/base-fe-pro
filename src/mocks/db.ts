@@ -99,7 +99,7 @@ function seedUsers(): DbUser[] {
 // ===========================================================================
 export type OrgCompanyStatus = "ACTIVE" | "SUSPENDED";
 export type OrgRole = "COMPANY_ADMIN" | "COMPANY_DELEGATE" | "COMPANY_MEMBER";
-export type OrgTeamType = "SUPERVISION" | "CONTRACTOR" | "TESTING";
+export type OrgTeamType = "PACKAGE" | "SUPERVISION" | "CONTRACTOR" | "TESTING";
 
 export interface DbCompany {
   id: string;
@@ -174,11 +174,13 @@ function seedProjects(): DbProject[] {
 
 function seedTeams(): DbTeam[] {
   return [
-    // prj_001 — two independent supervision roots (TVGS), each with children.
-    { id: "tea_001", projectId: "prj_001", parentTeamId: null, teamType: "SUPERVISION", name: "TVGS Nhóm 1 — Kết cấu", memberCount: 4, createdAt: iso(390) },
+    // prj_001 — two independent PACKAGES (gói thầu), each: PACKAGE → TVGS → NT/PTN.
+    { id: "tea_pkg1", projectId: "prj_001", parentTeamId: null, teamType: "PACKAGE", name: "Hợp đồng số 1 — Phần thân", memberCount: 0, createdAt: iso(392) },
+    { id: "tea_001", projectId: "prj_001", parentTeamId: "tea_pkg1", teamType: "SUPERVISION", name: "TVGS Nhóm 1 — Kết cấu", memberCount: 4, createdAt: iso(390) },
     { id: "tea_002", projectId: "prj_001", parentTeamId: "tea_001", teamType: "CONTRACTOR", name: "Nhà Thầu A — Cơ điện", memberCount: 6, createdAt: iso(380) },
     { id: "tea_003", projectId: "prj_001", parentTeamId: "tea_001", teamType: "TESTING", name: "Thí Nghiệm A — Bê tông", memberCount: 3, createdAt: iso(370) },
-    { id: "tea_004", projectId: "prj_001", parentTeamId: null, teamType: "SUPERVISION", name: "TVGS Nhóm 2 — Hạ tầng", memberCount: 3, createdAt: iso(360) },
+    { id: "tea_pkg2", projectId: "prj_001", parentTeamId: null, teamType: "PACKAGE", name: "Hợp đồng số 2 — Hạ tầng", memberCount: 0, createdAt: iso(362) },
+    { id: "tea_004", projectId: "prj_001", parentTeamId: "tea_pkg2", teamType: "SUPERVISION", name: "TVGS Nhóm 2 — Hạ tầng", memberCount: 3, createdAt: iso(360) },
     { id: "tea_005", projectId: "prj_001", parentTeamId: "tea_004", teamType: "CONTRACTOR", name: "Nhà Thầu B — San lấp", memberCount: 5, createdAt: iso(350) },
   ];
 }

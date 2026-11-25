@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export function LoginPage() {
   return (
-    <div className="bg-muted/40 flex min-h-svh items-center justify-center p-4">
+    <div className="flex min-h-svh items-center justify-center bg-gradient-to-br from-sky-50 via-white to-indigo-50 p-4">
       {/* Suspense required: LoginForm reads useSearchParams for ?redirect */}
       <Suspense>
         <LoginForm />

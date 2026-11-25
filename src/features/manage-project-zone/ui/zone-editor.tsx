@@ -1,17 +1,11 @@
 "use client";
 
-import "maplibre-gl/dist/maplibre-gl.css";
-
 import * as React from "react";
-import * as maplibregl from "maplibre-gl";
-import { TerraDraw, TerraDrawPolygonMode, TerraDrawSelectMode } from "terra-draw";
-import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import {
   Check,
-  Layers,
   Loader2,
   Pencil,
   PenLine,
@@ -34,268 +28,77 @@ import {
   DialogTitle,
 } from "@/shared/ui/dialog";
 import { cn } from "@/shared/lib/utils";
-import { projectQueries, type GeoPolygon } from "@/entities/project";
+import { projectQueries } from "@/entities/project";
 
 import { useSaveProjectZones } from "../model/hooks";
-import { DEFAULT_CENTER, DEFAULT_ZOOM, formatHectares, polygonHectares } from "../lib/geo";
-import { PlaceSearch } from "./place-search";
+import { formatHectares, polygonHectares } from "../lib/geo";
+import {
+  ZoneMap,
+  type FeatureId,
+  type ZoneItem,
+  type ZoneMapHandle,
+} from "./zone-map";
 
-const ESRI_SATELLITE =
-  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
-const OSM_STREET = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-
-type Basemap = "street" | "satellite";
-type FeatureId = string | number;
-type ZoneItem = { id: FeatureId; name: string; polygon: GeoPolygon };
-
-function basemapStyle(): maplibregl.StyleSpecification {
-  return {
-    version: 8,
-    sources: {
-      satellite: {
-        type: "raster",
-        tiles: [ESRI_SATELLITE],
-        tileSize: 256,
-        attribution: "Imagery © Esri, Maxar, Earthstar Geographics",
-      },
-      street: {
-        type: "raster",
-        tiles: [OSM_STREET],
-        tileSize: 256,
-        attribution: "© OpenStreetMap contributors",
-      },
-    },
-    layers: [
-      { id: "satellite", type: "raster", source: "satellite", layout: { visibility: "none" } },
-      { id: "street", type: "raster", source: "street" },
-    ],
-  };
-}
-
-function boundsOf(polygon: GeoPolygon): maplibregl.LngLatBoundsLike {
-  let minX = 180,
-    minY = 90,
-    maxX = -180,
-    maxY = -90;
-  for (const ring of polygon.coordinates) {
-    for (const [x, y] of ring) {
-      minX = Math.min(minX, x);
-      minY = Math.min(minY, y);
-      maxX = Math.max(maxX, x);
-      maxY = Math.max(maxY, y);
-    }
-  }
-  return [
-    [minX, minY],
-    [maxX, maxY],
-  ];
-}
-
-export function ZoneEditor({ projectId }: { projectId: string; projectName?: string }) {
+export function ZoneEditor({
+  projectId,
+}: {
+  projectId: string;
+  projectName?: string;
+}) {
   const t = useTranslations("projectZone");
   const zonesQuery = useQuery(projectQueries.zones(projectId));
   const save = useSaveProjectZones(projectId);
 
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const mapRef = React.useRef<maplibregl.Map | null>(null);
-  const drawRef = React.useRef<TerraDraw | null>(null);
-  const tRef = React.useRef(t);
-  React.useEffect(() => {
-    tRef.current = t;
-  }, [t]);
-  const suppressDirty = React.useRef(false);
+  const zoneMapRef = React.useRef<ZoneMapHandle>(null);
   const loadedRef = React.useRef(false);
 
   const [ready, setReady] = React.useState(false);
   const [drawing, setDrawing] = React.useState(false);
-  const [basemap, setBasemap] = React.useState<Basemap>("street");
   const [zones, setZones] = React.useState<ZoneItem[]>([]);
   const [dirty, setDirty] = React.useState(false);
 
-  // Inline rename + save dialog state.
   const [editingId, setEditingId] = React.useState<FeatureId | null>(null);
   const [editingName, setEditingName] = React.useState("");
   const [saveOpen, setSaveOpen] = React.useState(false);
   const [draft, setDraft] = React.useState<Record<string, string>>({});
 
-  const zoomTo = (polygon: GeoPolygon) =>
-    mapRef.current?.fitBounds(boundsOf(polygon), { padding: 60, maxZoom: 16 });
-
-  // --- Map + Terra Draw lifecycle -------------------------------------------
+  // Load saved zones once the map is ready.
   React.useEffect(() => {
-    if (!containerRef.current) return;
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: basemapStyle(),
-      center: DEFAULT_CENTER,
-      zoom: DEFAULT_ZOOM,
-    });
-    map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-    map.addControl(new maplibregl.GeolocateControl({ trackUserLocation: false }), "bottom-right");
-    mapRef.current = map;
-    map.on("error", (e) => console.error("[zone-map] MapLibre error:", e.error ?? e));
-
-    const onLoad = () => {
-      map.resize();
-      const draw = new TerraDraw({
-        adapter: new TerraDrawMapLibreGLAdapter({ map }),
-        modes: [
-          new TerraDrawPolygonMode(),
-          new TerraDrawSelectMode({
-            flags: {
-              polygon: {
-                feature: {
-                  // Move the whole zone…
-                  draggable: true,
-                  coordinates: {
-                    // …or drag individual corners, add midpoints, delete corners.
-                    draggable: true,
-                    midpoints: { draggable: true },
-                    deletable: true,
-                  },
-                },
-              },
-            },
-            // Bigger, colour-coded handles so vertices (blue) and midpoints
-            // (amber — drag to insert a point) are easy to grab and refine.
-            styles: {
-              selectionPointWidth: 7,
-              selectionPointColor: "#2563eb",
-              selectionPointOutlineColor: "#ffffff",
-              selectionPointOutlineWidth: 2,
-              midPointWidth: 5,
-              midPointColor: "#f59e0b",
-              midPointOutlineColor: "#ffffff",
-              midPointOutlineWidth: 1,
-            },
-          }),
-        ],
-      });
-      draw.start();
-      draw.setMode("select");
-
-      // A zone is a *named* polygon; in-progress (unnamed) drawing is excluded.
-      const reconcile = (markDirty: boolean) => {
-        const named = draw
-          .getSnapshot()
-          .filter((f) => f.geometry?.type === "Polygon" && f.properties?.name);
-        setZones(
-          named.map((f) => ({
-            id: f.id as FeatureId,
-            name: String(f.properties.name),
-            polygon: f.geometry as unknown as GeoPolygon,
-          })),
-        );
-        if (markDirty) setDirty(true);
-      };
-
-      draw.on("change", () => {
-        reconcile(!suppressDirty.current);
-        suppressDirty.current = false;
-      });
-      draw.on("finish", (id) => {
-        // Auto-name the just-drawn polygon (user can rename in the list / on save).
-        const count = draw.getSnapshot().filter((f) => f.geometry?.type === "Polygon").length;
-        draw.updateFeatureProperties(id, {
-          name: tRef.current("list.defaultName", { index: count }),
-        });
-        setDrawing(false);
-        draw.setMode("select");
-      });
-
-      drawRef.current = draw;
-      setReady(true);
-    };
-
-    map.on("load", onLoad);
-    return () => {
-      drawRef.current?.stop();
-      drawRef.current = null;
-      map.remove();
-      mapRef.current = null;
-      setReady(false);
-      loadedRef.current = false;
-    };
-  }, []);
-
-  // --- Load saved zones once, zoom to the first ------------------------------
-  React.useEffect(() => {
-    const draw = drawRef.current;
-    if (!ready || !draw || loadedRef.current) return;
+    if (!ready || loadedRef.current || !zonesQuery.data) return;
     loadedRef.current = true;
     const saved = zonesQuery.data?.zones ?? [];
     if (saved.length) {
-      suppressDirty.current = true;
-      draw.addFeatures(
-        saved.map((z) => ({
-          type: "Feature",
-          geometry: z.polygon,
-          properties: { mode: "polygon", name: z.name },
-        })) as Parameters<typeof draw.addFeatures>[0],
-      );
-      draw.setMode("select");
-      zoomTo(saved[0].polygon);
+      zoneMapRef.current?.loadZones(saved);
+      zoneMapRef.current?.fitBounds(saved[0].polygon);
     }
   }, [ready, zonesQuery.data]);
 
-  // --- Basemap toggle --------------------------------------------------------
-  React.useEffect(() => {
-    const map = mapRef.current;
-    if (!map || !ready) return;
-    map.setLayoutProperty("satellite", "visibility", basemap === "satellite" ? "visible" : "none");
-    map.setLayoutProperty("street", "visibility", basemap === "street" ? "visible" : "none");
-  }, [basemap, ready]);
+  const handleZonesChange = (newZones: ZoneItem[], isUserAction: boolean) => {
+    setZones(newZones);
+    if (isUserAction) setDirty(true);
+  };
 
   // --- Actions ---------------------------------------------------------------
   const startDrawing = () => {
-    drawRef.current?.setMode("polygon");
+    zoneMapRef.current?.startDraw();
     setDrawing(true);
   };
   const cancelDrawing = () => {
-    drawRef.current?.setMode("select");
+    zoneMapRef.current?.cancelDraw();
     setDrawing(false);
   };
-  const removeZone = (id: FeatureId) =>
-    drawRef.current?.removeFeatures([id] as Parameters<
-      NonNullable<typeof drawRef.current>["removeFeatures"]
-    >[0]);
+  const removeZone = (id: FeatureId) => zoneMapRef.current?.removeZone(id);
 
   const renameZone = (id: FeatureId, name: string) => {
-    const draw = drawRef.current;
-    if (!draw) return;
-    const clean = name.trim();
-    if (clean) draw.updateFeatureProperties(id, { name: clean });
+    zoneMapRef.current?.renameZone(id, name);
     setEditingId(null);
   };
 
   const editPolygon = (zone: ZoneItem) => {
-    const draw = drawRef.current;
-    if (!draw) return;
-    draw.setMode("select");
+    zoneMapRef.current?.fitBounds(zone.polygon);
+    zoneMapRef.current?.selectZone(zone.id);
     setDrawing(false);
-    zoomTo(zone.polygon);
-    try {
-      draw.selectFeature(zone.id);
-    } catch {
-      /* selection is best-effort */
-    }
     toast.info(t("editPolygonHint"));
-  };
-
-  const handleLocate = (center: [number, number], bbox: [number, number, number, number] | null) => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (bbox) {
-      map.fitBounds(
-        [
-          [bbox[0], bbox[1]],
-          [bbox[2], bbox[3]],
-        ],
-        { padding: 60, maxZoom: 16 },
-      );
-    } else {
-      map.flyTo({ center, zoom: 14 });
-    }
   };
 
   const openSave = () => {
@@ -307,10 +110,9 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
     setSaveOpen(true);
   };
   const confirmSave = () => {
-    const draw = drawRef.current;
     const payload = zones.map((z) => {
       const name = (draft[String(z.id)] ?? z.name).trim();
-      if (draw && name && name !== z.name) draw.updateFeatureProperties(z.id, { name });
+      if (name && name !== z.name) zoneMapRef.current?.renameZone(z.id, name);
       return { name, polygon: z.polygon };
     });
     save.mutate(payload, {
@@ -320,7 +122,9 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
       },
     });
   };
-  const draftHasEmpty = zones.some((z) => !(draft[String(z.id)] ?? z.name).trim());
+  const draftHasEmpty = zones.some(
+    (z) => !(draft[String(z.id)] ?? z.name).trim(),
+  );
 
   const totalHa = zones.reduce((sum, z) => {
     try {
@@ -332,26 +136,12 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
 
   return (
     <div className="relative h-[70vh] min-h-[420px] w-full overflow-hidden rounded-lg border">
-      <div ref={containerRef} className="h-full w-full" />
-
-      {/* Search — top-left */}
-      <div className="absolute top-3 left-3 z-10">
-        <PlaceSearch onLocate={handleLocate} />
-      </div>
-
-      {/* Basemap toggle — top-right */}
-      <div className="absolute top-3 right-3 z-10">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          className="shadow-sm"
-          onClick={() => setBasemap((b) => (b === "satellite" ? "street" : "satellite"))}
-        >
-          <Layers />
-          {t(basemap === "satellite" ? "basemap.street" : "basemap.satellite")}
-        </Button>
-      </div>
+      <ZoneMap
+        ref={zoneMapRef}
+        onZonesChange={handleZonesChange}
+        onDrawFinish={() => setDrawing(false)}
+        onReady={() => setReady(true)}
+      />
 
       {/* Zone list — right column */}
       <div className="absolute top-14 right-3 z-10 w-72">
@@ -361,7 +151,9 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
           </div>
           <ScrollArea className="max-h-64">
             {zones.length === 0 ? (
-              <p className="text-muted-foreground px-3 pb-3 text-xs">{t("list.empty")}</p>
+              <p className="text-muted-foreground px-3 pb-3 text-xs">
+                {t("list.empty")}
+              </p>
             ) : (
               <ul className="grid gap-1 px-2 pb-2">
                 {zones.map((zone) => (
@@ -376,7 +168,8 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
                         onChange={(e) => setEditingName(e.target.value)}
                         onBlur={() => renameZone(zone.id, editingName)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter") renameZone(zone.id, editingName);
+                          if (e.key === "Enter")
+                            renameZone(zone.id, editingName);
                           if (e.key === "Escape") setEditingId(null);
                         }}
                         className="h-7 flex-1"
@@ -385,9 +178,13 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
                       <button
                         type="button"
                         className="grid flex-1 text-left"
-                        onClick={() => zoomTo(zone.polygon)}
+                        onClick={() =>
+                          zoneMapRef.current?.fitBounds(zone.polygon)
+                        }
                       >
-                        <span className="truncate text-sm font-medium">{zone.name}</span>
+                        <span className="truncate text-sm font-medium">
+                          {zone.name}
+                        </span>
                         <span className="text-muted-foreground text-xs">
                           {formatHectares(polygonHectares(zone.polygon))}
                         </span>
@@ -455,7 +252,10 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
             <span className="text-sm font-medium">
               {t("total", { value: formatHectares(totalHa) })}
               {dirty ? (
-                <span className="text-amber-600 dark:text-amber-500"> · {t("unsaved")}</span>
+                <span className="text-amber-600 dark:text-amber-500">
+                  {" "}
+                  · {t("unsaved")}
+                </span>
               ) : null}
             </span>
           ) : (
@@ -469,7 +269,12 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
 
           <div className="flex shrink-0 items-center gap-2">
             {drawing ? (
-              <Button type="button" variant="outline" size="sm" onClick={cancelDrawing}>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={cancelDrawing}
+              >
                 <X />
                 {t("draw.cancel")}
               </Button>
@@ -516,7 +321,10 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
                 <Input
                   value={draft[String(zone.id)] ?? zone.name}
                   onChange={(e) =>
-                    setDraft((d) => ({ ...d, [String(zone.id)]: e.target.value }))
+                    setDraft((d) => ({
+                      ...d,
+                      [String(zone.id)]: e.target.value,
+                    }))
                   }
                   placeholder={t("saveDialog.namePlaceholder")}
                 />
@@ -524,7 +332,11 @@ export function ZoneEditor({ projectId }: { projectId: string; projectName?: str
             ))}
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setSaveOpen(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setSaveOpen(false)}
+            >
               {t("draw.cancel")}
             </Button>
             <Button

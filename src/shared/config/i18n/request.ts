@@ -16,5 +16,8 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages: (await import(`./messages/${locale}.json`)).default,
+    // Mọi ngày/giờ hiển thị (format.dateTime/relativeTime) LUÔN theo giờ Việt Nam,
+    // độc lập múi giờ trình duyệt/máy chủ. NextIntlClientProvider tự kế thừa giá trị này.
+    timeZone: "Asia/Ho_Chi_Minh",
   };
 });

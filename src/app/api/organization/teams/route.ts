@@ -2,32 +2,10 @@ import type { NextRequest } from "next/server";
 
 import { backendErrorMessage, callBackend, toArray } from "@/shared/api/backend";
 import { jsonData, jsonError, requireAuth } from "@/shared/api/server";
-import type { Team } from "@/entities/team";
-
-interface RawTeam {
-  id: string;
-  project: string;
-  parentTeam: string | null;
-  teamType: Team["teamType"];
-  name: string;
-  memberCount: number;
-  createdAt: string;
-}
-
-function toTeam(raw: RawTeam): Team {
-  return {
-    id: raw.id,
-    projectId: raw.project,
-    parentTeamId: raw.parentTeam ?? null,
-    teamType: raw.teamType,
-    name: raw.name,
-    memberCount: raw.memberCount ?? 0,
-    createdAt: raw.createdAt,
-  };
-}
+import { teamFromBackend as toTeam, type RawTeam, type Team } from "@/entities/team";
 
 export async function GET(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:view");
+  const auth = requireAuth(request, "projects:view");
   if ("response" in auth) return auth.response;
 
   const projectId = request.nextUrl.searchParams.get("projectId");
@@ -48,7 +26,12 @@ export async function POST(request: NextRequest) {
   if ("response" in auth) return auth.response;
 
   const body = (await request.json().catch(() => null)) as
-    | { projectId?: string; name?: string; teamType?: string; parentTeamId?: string | null }
+    | {
+        projectId?: string;
+        name?: string;
+        teamType?: string;
+        placements?: Array<{ parentTeam: string; package: string | null }>;
+      }
     | null;
   if (!body?.projectId || !body.name || !body.teamType) {
     return jsonError(422, "VALIDATION_ERROR", "Missing team fields.");
@@ -60,7 +43,8 @@ export async function POST(request: NextRequest) {
       project: body.projectId,
       name: body.name,
       teamType: body.teamType,
-      parentTeam: body.parentTeamId ?? null,
+      // Nhiều cha: mỗi phần tử = 1 vị trí (nhóm cha + Hợp đồng).
+      placements: body.placements ?? [],
     },
   });
   if (!res.ok) {

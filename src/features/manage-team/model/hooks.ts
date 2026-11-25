@@ -32,8 +32,8 @@ export function useUpdateTeam() {
   const qc = useQueryClient();
   const t = useTranslations("organization");
   return useMutation({
-    mutationFn: ({ id, name }: { id: string; name: string }) =>
-      teamApi.update(id, { name }),
+    mutationFn: ({ id, ...input }: { id: string; name: string; placementKeys?: string[] }) =>
+      teamApi.update(id, input),
     onSuccess: () => {
       toast.success(t("toasts.teamUpdated"));
       qc.invalidateQueries({ queryKey: teamQueries.all() });

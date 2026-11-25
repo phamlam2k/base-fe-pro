@@ -11,6 +11,8 @@ interface RawProject {
   company: string;
   name: string;
   status: Project["status"];
+  location: string;
+  contractPackage: string;
   teamCount: number;
   createdAt: string;
 }
@@ -21,6 +23,8 @@ function toProject(raw: RawProject): Project {
     companyId: raw.company,
     name: raw.name,
     status: raw.status,
+    location: raw.location ?? "",
+    contractPackage: raw.contractPackage ?? "",
     teamCount: raw.teamCount ?? 0,
     createdAt: raw.createdAt,
   };
@@ -32,7 +36,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
   const { id } = await params;
   const body = (await request.json().catch(() => null)) as
-    | { name?: string; status?: string }
+    | { name?: string; status?: string; location?: string; contractPackage?: string }
     | null;
   const res = await callBackend<RawProject>(`/rbac-projects/${id}/`, {
     method: "PATCH",

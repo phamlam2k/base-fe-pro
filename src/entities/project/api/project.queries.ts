@@ -14,6 +14,13 @@ export const projectQueries = {
       enabled: Boolean(companyId),
     }),
 
+  // Dự án của user hiện tại (cho thanh chọn dự án) — không cần companyId.
+  myList: () =>
+    queryOptions({
+      queryKey: [...projectQueries.all(), "my-list"],
+      queryFn: () => projectApi.myList(),
+    }),
+
   zoneKeys: () => [...projectQueries.all(), "zone"] as const,
   zones: (id: string) =>
     queryOptions({

@@ -1,5 +1,4 @@
-/** Public API of the `theme` feature (appearance preferences + toggles). */
-export { ThemeToggle } from "./ui/theme-toggle";
+/** Public API of the `theme` feature (appearance preferences). */
 export {
   ThemeCustomizerPopover,
   ThemeCustomizerControls,

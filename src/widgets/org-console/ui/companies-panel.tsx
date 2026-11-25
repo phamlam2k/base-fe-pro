@@ -1,8 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { Ban, CheckCircle2, MoreHorizontal, Plus, Search } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
+import {
+  Ban,
+  CheckCircle2,
+  MoreHorizontal,
+  Plus,
+  Search,
+  Users,
+  UserPlus,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+
+import { formatDate } from "@/shared/lib/format-date";
 import type {
   ColumnDef,
   PaginationState,
@@ -28,6 +38,8 @@ import { useQuery } from "@tanstack/react-query";
 import { companyQueries } from "@/entities/company";
 import { useUpdateCompany } from "@/features/manage-company";
 import type { Company, CompanyListParams } from "@/entities/company";
+import { UserFormDialog } from "@/features/manage-user";
+import { CompanyAdminsDialog } from "./company-admins-dialog";
 
 export function CompaniesPanel() {
   const t = useTranslations("organization");
@@ -92,7 +104,7 @@ export function CompaniesPanel() {
         id: "actions",
         cell: ({ row }) => (
           <div className="text-right">
-            <PermissionGate permission="orgs:manage">
+            <PermissionGate permission="companies:manage">
               <CompanyActions
                 company={row.original}
                 onToggle={(company) =>
@@ -127,7 +139,7 @@ export function CompaniesPanel() {
             className="w-64 pl-8"
           />
         </div>
-        <PermissionGate permission="orgs:manage">
+        <PermissionGate permission="companies:manage">
           <Button className="ml-auto" onClick={() => setDialogOpen(true)}>
             <Plus />
             {t("companies.add")}
@@ -161,34 +173,62 @@ function CompanyActions({
   const t = useTranslations("organization");
   const tCommon = useTranslations("common");
   const { can } = usePermission();
-  if (!can("orgs:manage")) return null;
+  const [createAdminOpen, setCreateAdminOpen] = React.useState(false);
+  const [viewAdminsOpen, setViewAdminsOpen] = React.useState(false);
+  if (!can("companies:manage")) return null;
 
   const isActive = company.status === "ACTIVE";
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={tCommon("openMenu")}>
-          <MoreHorizontal />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          variant={isActive ? "destructive" : "default"}
-          onClick={() => onToggle(company)}
-        >
-          {isActive ? <Ban /> : <CheckCircle2 />}
-          {isActive ? t("companies.suspend") : t("companies.activate")}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon-sm" aria-label={tCommon("openMenu")}>
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setCreateAdminOpen(true)}>
+            <UserPlus />
+            {t("companies.createAdmin")}
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setViewAdminsOpen(true)}>
+            <Users />
+            {t("companies.viewAdmins")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            variant={isActive ? "destructive" : "default"}
+            onClick={() => onToggle(company)}
+          >
+            {isActive ? <Ban /> : <CheckCircle2 />}
+            {isActive ? t("companies.suspend") : t("companies.activate")}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* SuperAdmin tạo tài khoản Admin (COMPANY_ADMIN) gắn cứng công ty này. */}
+      <UserFormDialog
+        open={createAdminOpen}
+        onOpenChange={setCreateAdminOpen}
+        preset={{
+          companyId: company.id,
+          companyName: company.name,
+          companyRole: "COMPANY_ADMIN",
+          lockCompany: true,
+          lockCompanyRole: true,
+          title: t("companies.createAdminFor", { name: company.name }),
+        }}
+      />
+      <CompanyAdminsDialog
+        open={viewAdminsOpen}
+        onOpenChange={setViewAdminsOpen}
+        company={company}
+      />
+    </>
   );
 }
 
 function CreatedCell({ value }: { value: string }) {
-  const format = useFormatter();
   return (
-    <span className="text-muted-foreground">
-      {format.dateTime(new Date(value), { dateStyle: "medium" })}
-    </span>
+    <span className="text-muted-foreground">{formatDate(value)}</span>
   );
 }

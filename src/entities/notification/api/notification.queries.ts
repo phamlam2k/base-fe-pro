@@ -6,11 +6,18 @@ import { notificationApi } from "@/entities/notification/api/notification.api";
 export const notificationQueries = {
   all: () => ["notification"] as const,
 
-  list: () =>
+  /** Poll nhẹ số chưa đọc (~25s), theo dự án đang chọn. */
+  unreadCount: (projectId?: string) =>
     queryOptions({
-      queryKey: [...notificationQueries.all(), "list"],
-      queryFn: notificationApi.list,
-      // Lightweight polling — replace with SSE/WebSocket for real-time needs.
-      refetchInterval: 30_000,
+      queryKey: [...notificationQueries.all(), "unread-count", projectId ?? null],
+      queryFn: () => notificationApi.unreadCount(projectId),
+      refetchInterval: 25_000,
+    }),
+
+  /** Danh sách đầy đủ theo dự án — chỉ tải khi mở dropdown (enabled ở component). */
+  list: (projectId?: string) =>
+    queryOptions({
+      queryKey: [...notificationQueries.all(), "list", projectId ?? null],
+      queryFn: () => notificationApi.list(projectId),
     }),
 };

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 
 import {
   AUTH_COOKIE,
+  COOKIE_SECURE,
   SESSION_MAX_AGE_SECONDS,
   decodeSessionToken,
   encodeSessionToken,
@@ -35,21 +36,38 @@ const toCamelKey = (key: string) =>
 
 type Json = unknown;
 
-function convertKeys(value: Json, fn: (key: string) => string): Json {
-  if (Array.isArray(value)) return value.map((item) => convertKeys(item, fn));
+function convertKeys(
+  value: Json,
+  fn: (key: string) => string,
+  preserve: ReadonlySet<string>,
+): Json {
+  if (Array.isArray(value))
+    return value.map((item) => convertKeys(item, fn, preserve));
   if (value && typeof value === "object") {
     return Object.fromEntries(
       Object.entries(value as Record<string, Json>).map(([k, v]) => [
         fn(k),
-        convertKeys(v, fn),
+        // Opaque JSON blobs (e.g. a PDF template's `fields`) hold literal
+        // camelCase property names like `dataKey` that must round-trip
+        // verbatim — converting them would mint a divergent `data_key` that
+        // collides with `dataKey` when camelized back on the next read.
+        preserve.has(k) ? v : convertKeys(v, fn, preserve),
       ]),
     );
   }
   return value;
 }
 
-export const camelize = (value: Json) => convertKeys(value, toCamelKey);
-export const snakeize = (value: Json) => convertKeys(value, toSnakeKey);
+const NO_PRESERVE: ReadonlySet<string> = new Set();
+
+export const camelize = (
+  value: Json,
+  preserve: ReadonlySet<string> = NO_PRESERVE,
+) => convertKeys(value, toCamelKey, preserve);
+export const snakeize = (
+  value: Json,
+  preserve: ReadonlySet<string> = NO_PRESERVE,
+) => convertKeys(value, toSnakeKey, preserve);
 
 // ---------------------------------------------------------------------------
 // Transport
@@ -106,40 +124,17 @@ async function refreshAccess(
   return { access: data.access, refresh: data.refresh ?? refresh };
 }
 
-export interface CallOptions {
-  method?: string;
-  /** camelCase body — converted to snake_case before sending. */
-  body?: Json;
-  /** Skip the session cookie (used by the login exchange). */
-  anonymous?: boolean;
-  /** Explicit bearer token, e.g. right after obtaining it at login. */
-  accessToken?: string;
-}
-
 /**
- * Call the backend using the current session's JWT. On a 401 it refreshes the
- * token, rotates the httpOnly cookie, and retries once. Response bodies are
- * camelCased. Throws only on network errors; HTTP errors are returned.
+ * Gọi backend bằng JWT trong cookie phiên; gặp 401 thì làm mới token, xoay cookie và
+ * thử lại 1 lần. Trả Response thô — dùng trực tiếp cho body không phải JSON (multipart).
  */
-export async function callBackend<T = Json>(
+export async function fetchWithSession(
   path: string,
-  options: CallOptions = {},
-): Promise<BackendResult<T>> {
-  const { method = "GET", body, anonymous = false, accessToken } = options;
-  const init: RequestInit = { method };
-  if (body !== undefined) init.body = JSON.stringify(snakeize(body));
-
-  if (anonymous || accessToken) {
-    const response = await doFetch(path, init, accessToken);
-    const data = camelize(await readJson(response));
-    return { status: response.status, ok: response.ok, data: data as T };
-  }
-
+  init: RequestInit,
+): Promise<Response> {
   const cookieStore = await cookies();
   const session = decodeSessionToken(cookieStore.get(AUTH_COOKIE)?.value);
-  if (!session) {
-    return { status: 401, ok: false, data: null as T };
-  }
+  if (!session) return new Response(null, { status: 401 });
 
   let response = await doFetch(path, init, session.access);
 
@@ -152,7 +147,7 @@ export async function callBackend<T = Json>(
         {
           httpOnly: true,
           sameSite: "lax",
-          secure: process.env.NODE_ENV === "production",
+          secure: COOKIE_SECURE,
           path: "/",
           maxAge: SESSION_MAX_AGE_SECONDS,
         },
@@ -160,8 +155,53 @@ export async function callBackend<T = Json>(
       response = await doFetch(path, init, refreshed.access);
     }
   }
+  return response;
+}
 
-  const data = camelize(await readJson(response));
+export interface CallOptions {
+  method?: string;
+  /** camelCase body — converted to snake_case before sending. */
+  body?: Json;
+  /** Skip the session cookie (used by the login exchange). */
+  anonymous?: boolean;
+  /** Explicit bearer token, e.g. right after obtaining it at login. */
+  accessToken?: string;
+  /**
+   * Keys whose values are opaque JSON blobs — kept verbatim instead of having
+   * their nested keys snake/camel converted in either direction. Use for a PDF
+   * template's `fields` (items carry literal camelCase props like `dataKey`).
+   */
+  preserveKeys?: string[];
+}
+
+/**
+ * Call the backend using the current session's JWT. On a 401 it refreshes the
+ * token, rotates the httpOnly cookie, and retries once. Response bodies are
+ * camelCased. Throws only on network errors; HTTP errors are returned.
+ */
+export async function callBackend<T = Json>(
+  path: string,
+  options: CallOptions = {},
+): Promise<BackendResult<T>> {
+  const {
+    method = "GET",
+    body,
+    anonymous = false,
+    accessToken,
+    preserveKeys,
+  } = options;
+  const preserve = preserveKeys ? new Set(preserveKeys) : NO_PRESERVE;
+  const init: RequestInit = { method };
+  if (body !== undefined) init.body = JSON.stringify(snakeize(body, preserve));
+
+  if (anonymous || accessToken) {
+    const response = await doFetch(path, init, accessToken);
+    const data = camelize(await readJson(response), preserve);
+    return { status: response.status, ok: response.ok, data: data as T };
+  }
+
+  const response = await fetchWithSession(path, init);
+  const data = camelize(await readJson(response), preserve);
   return { status: response.status, ok: response.ok, data: data as T };
 }
 

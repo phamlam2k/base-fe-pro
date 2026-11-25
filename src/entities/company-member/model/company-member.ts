@@ -20,6 +20,8 @@ export interface Member {
   name: string;
   email: string;
   role: OrgRole;
+  /** Vai trò nghiệp vụ của tài khoản (investor/supervisor/contractor/lab); "" nếu chưa đặt. */
+  businessRole: string;
   /** Custom job title, mainly for COMPANY_DELEGATE (e.g. "Phó Tổng Giám đốc"). */
   customTitle: string;
   createdAt: string;

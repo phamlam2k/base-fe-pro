@@ -6,6 +6,7 @@ import { callBackend } from "@/shared/api/backend";
 import { platformRoleToAppRole } from "@/shared/lib/auth/roles";
 import {
   AUTH_COOKIE,
+  COOKIE_SECURE,
   SESSION_MAX_AGE_SECONDS,
   encodeSessionToken,
 } from "@/shared/lib/auth/token";
@@ -27,6 +28,8 @@ interface MeResponse {
   email: string;
   fullName?: string;
   platformRole?: string;
+  role?: string; // vai trò nghiệp vụ Madoka (AccountRole)
+  mustChangePassword?: boolean;
 }
 
 /**
@@ -68,6 +71,8 @@ export async function POST(request: NextRequest) {
     email: meRes.data.email,
     name: meRes.data.fullName || meRes.data.email,
     role,
+    madokaRole: meRes.data.role ?? "",
+    mustChangePassword: meRes.data.mustChangePassword ?? false,
   };
 
   const token = encodeSessionToken({
@@ -75,6 +80,8 @@ export async function POST(request: NextRequest) {
     email: sessionUser.email,
     name: sessionUser.name,
     role,
+    madokaRole: sessionUser.madokaRole,
+    mustChangePassword: sessionUser.mustChangePassword,
     access,
     refresh,
     exp: Math.floor(Date.now() / 1000) + SESSION_MAX_AGE_SECONDS,
@@ -86,7 +93,7 @@ export async function POST(request: NextRequest) {
   response.cookies.set(AUTH_COOKIE, token, {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: COOKIE_SECURE,
     path: "/",
     maxAge: SESSION_MAX_AGE_SECONDS,
   });

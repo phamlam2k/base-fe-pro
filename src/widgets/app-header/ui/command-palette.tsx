@@ -1,9 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Languages, LogOut, Moon, Search, Sun } from "lucide-react";
+import { Languages, LogOut, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/shared/ui/button";
@@ -18,8 +17,9 @@ import {
 } from "@/shared/ui/command";
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { setUserLocale } from "@/shared/config/i18n/actions";
+import { canViewProjects } from "@/shared/config/permissions";
 import { useLogout } from "@/features/auth-by-credentials";
-import { usePermission } from "@/entities/session";
+import { usePermission, useSession } from "@/entities/session";
 
 /**
  * Global command palette (Ctrl/Cmd+K): permission-filtered navigation plus
@@ -31,7 +31,7 @@ export function CommandPalette() {
   const t = useTranslations("commandPalette");
   const tNav = useTranslations("nav");
   const { can } = usePermission();
-  const { setTheme } = useTheme();
+  const { user } = useSession();
   const logout = useLogout();
 
   React.useEffect(() => {
@@ -51,7 +51,9 @@ export function CommandPalette() {
   }
 
   const navItems = NAV_GROUPS.flatMap((group) => group.items).filter(
-    (item) => !item.permission || can(item.permission),
+    (item) =>
+      (!item.permission || can(item.permission)) &&
+      (!item.projectAccess || canViewProjects(user.role, user.madokaRole)),
   );
 
   return (
@@ -94,14 +96,6 @@ export function CommandPalette() {
           <CommandSeparator />
 
           <CommandGroup heading={t("actions")}>
-            <CommandItem onSelect={() => run(() => setTheme("light"))}>
-              <Sun />
-              {t("themeLight")}
-            </CommandItem>
-            <CommandItem onSelect={() => run(() => setTheme("dark"))}>
-              <Moon />
-              {t("themeDark")}
-            </CommandItem>
             <CommandItem
               onSelect={() =>
                 run(async () => {

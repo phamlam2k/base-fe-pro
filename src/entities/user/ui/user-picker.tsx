@@ -33,16 +33,19 @@ export function UserPicker({
   value,
   onChange,
   disabled,
+  role,
 }: {
   value: UserOption | null;
   onChange: (user: UserOption) => void;
   disabled?: boolean;
+  /** Chỉ hiện user có vai trò nghiệp vụ này (supervisor/contractor/lab/investor). */
+  role?: string;
 }) {
   const t = useTranslations("organization");
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState("");
   const debounced = useDebounce(search);
-  const query = useQuery(userQueries.lookup(debounced));
+  const query = useQuery(userQueries.lookup(debounced, role));
   const users = query.data ?? [];
 
   return (

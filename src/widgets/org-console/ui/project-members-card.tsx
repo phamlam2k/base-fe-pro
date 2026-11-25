@@ -1,19 +1,26 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Trash2, Users } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, Trash2, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Button } from "@/shared/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/shared/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/shared/ui/popover";
+import { cn } from "@/shared/lib/utils";
 import { ConfirmDialog } from "@/shared/ui/confirm-dialog";
 import { PermissionGate } from "@/entities/session";
 import { MemberRoleBadge } from "@/entities/company-member";
@@ -48,13 +55,16 @@ export function ProjectMembersCard({
   const deleteMember = useDeleteProjectMember();
 
   const [picked, setPicked] = React.useState<string>("");
+  const [pickerOpen, setPickerOpen] = React.useState(false);
   const [toRemove, setToRemove] = React.useState<ProjectMember | null>(null);
 
   const assigned = membersQuery.data ?? [];
   const assignedIds = new Set(assigned.map((m) => m.companyMemberId));
+  // CHỈ CĐT: người gán vào dự án (bên chủ đầu tư) phải có vai trò nghiệp vụ = investor.
   const available = (companyMembersQuery.data?.items ?? []).filter(
-    (m) => !assignedIds.has(m.id),
+    (m) => !assignedIds.has(m.id) && m.businessRole === "investor",
   );
+  const pickedMember = available.find((m) => m.id === picked);
 
   return (
     <Card>
@@ -69,22 +79,61 @@ export function ProjectMembersCard({
 
         <PermissionGate permission="orgs:manage">
           <div className="flex flex-wrap items-center gap-2">
-            <Select value={picked} onValueChange={setPicked} disabled={!available.length}>
-              <SelectTrigger className="min-w-64">
-                <SelectValue placeholder={t("projectMembers.pickPlaceholder")} />
-              </SelectTrigger>
-              <SelectContent>
-                {available.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name || m.email} · {t(`roles.${m.role}`)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={pickerOpen}
+                  disabled={!available.length}
+                  className="min-w-64 justify-between font-normal"
+                >
+                  <span className={cn("truncate", !pickedMember && "text-muted-foreground")}>
+                    {pickedMember
+                      ? `${pickedMember.name || pickedMember.email} · ${t(`roles.${pickedMember.role}`)}`
+                      : t("projectMembers.pickPlaceholder")}
+                  </span>
+                  <ChevronsUpDown className="ml-2 size-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
+                <Command>
+                  <CommandInput placeholder={t("projectMembers.searchPlaceholder")} />
+                  <CommandList>
+                    <CommandEmpty>{t("projectMembers.noneFound")}</CommandEmpty>
+                    <CommandGroup>
+                      {available.map((m) => (
+                        <CommandItem
+                          key={m.id}
+                          value={`${m.name} ${m.email} ${t(`roles.${m.role}`)}`}
+                          onSelect={() => {
+                            setPicked(m.id);
+                            setPickerOpen(false);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 size-4",
+                              picked === m.id ? "opacity-100" : "opacity-0",
+                            )}
+                          />
+                          <span className="truncate">
+                            {m.name || m.email} · {t(`roles.${m.role}`)}
+                          </span>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             <Button
               disabled={!picked || createMember.isPending}
               onClick={() =>
-                createMember.mutate(picked, { onSuccess: () => setPicked("") })
+                createMember.mutate(picked, {
+                  onSuccess: () => setPicked(""),
+                })
               }
             >
               <Plus />

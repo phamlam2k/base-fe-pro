@@ -26,7 +26,7 @@ function toProjectMember(raw: RawProjectMember): ProjectMember {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:view");
+  const auth = requireAuth(request, "projects:view");
   if ("response" in auth) return auth.response;
 
   const projectId = request.nextUrl.searchParams.get("projectId");

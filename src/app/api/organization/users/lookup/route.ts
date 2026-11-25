@@ -16,8 +16,11 @@ export async function GET(request: NextRequest) {
   if ("response" in auth) return auth.response;
 
   const search = request.nextUrl.searchParams.get("search") ?? "";
+  const role = request.nextUrl.searchParams.get("role") ?? "";
   const params = new URLSearchParams({ pageSize: "20" });
   if (search) params.set("search", search);
+  // Lọc theo vai trò nghiệp vụ (TVGS/NT/PTN/CĐT) khi picker cần đúng role.
+  if (role) params.set("role", role);
 
   const res = await callBackend(`/user-lookup/?${params}`);
   if (!res.ok) {

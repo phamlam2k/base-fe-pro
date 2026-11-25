@@ -8,11 +8,11 @@ import { SidebarTrigger } from "@/shared/ui/sidebar";
 import { CommandPalette } from "./command-palette";
 import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeCustomizerPopover } from "@/features/theme";
-import { ThemeToggle } from "@/features/theme";
 import { UserNav } from "./user-nav";
 import { FeatureGate } from "@/shared/ui/feature-gate";
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { NotificationsBell } from "@/features/notifications";
+import { ProjectSelector } from "@/features/select-project";
 
 export function AppHeader() {
   const t = useTranslations("nav");
@@ -31,6 +31,7 @@ export function AppHeader() {
       </span>
 
       <div className="ml-auto flex items-center gap-1">
+        <ProjectSelector />
         <FeatureGate flag="commandPalette">
           <CommandPalette />
         </FeatureGate>
@@ -38,7 +39,6 @@ export function AppHeader() {
           <NotificationsBell />
         </FeatureGate>
         <ThemeCustomizerPopover />
-        <ThemeToggle />
         <LocaleSwitcher />
         <UserNav />
       </div>

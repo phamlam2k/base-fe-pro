@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import { Plus, Trash2, UserRound } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+
+import { formatDate } from "@/shared/lib/format-date";
 
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
@@ -40,7 +42,6 @@ export function TeamMembersDialog({
   team: Team | null;
 }) {
   const t = useTranslations("organization");
-  const format = useFormatter();
   const teamId = team?.id ?? "";
   const membersQuery = useQuery(teamMemberQueries.list(teamId));
   const deleteMember = useDeleteTeamMember();
@@ -98,7 +99,7 @@ export function TeamMembersDialog({
                   </div>
                   <span className="text-muted-foreground hidden text-xs sm:block">
                     {t("teamMembers.joinedLabel")}{" "}
-                    {format.dateTime(new Date(member.createdAt), { dateStyle: "medium" })}
+                    {formatDate(member.createdAt)}
                   </span>
                   <Badge variant={member.role === "TEAM_LEAD" ? "default" : "outline"}>
                     {t(`teamRoles.${member.role}`)}
@@ -127,7 +128,12 @@ export function TeamMembersDialog({
         </div>
 
         {team ? (
-          <TeamMemberFormDialog open={addOpen} onOpenChange={setAddOpen} teamId={team.id} />
+          <TeamMemberFormDialog
+            open={addOpen}
+            onOpenChange={setAddOpen}
+            teamId={team.id}
+            teamType={team.teamType}
+          />
         ) : null}
 
         <ConfirmDialog

@@ -52,11 +52,18 @@ export function ProjectFormDialog({
   const schema = React.useMemo(() => createProjectFormSchema(t), [t]);
   const form = useForm<ProjectFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { name: project?.name ?? "" },
+    defaultValues: {
+      name: project?.name ?? "",
+      location: project?.location ?? "",
+    },
   });
 
   React.useEffect(() => {
-    if (open) form.reset({ name: project?.name ?? "" });
+    if (open)
+      form.reset({
+        name: project?.name ?? "",
+        location: project?.location ?? "",
+      });
   }, [open, project, form]);
 
   function onSubmit(values: ProjectFormValues) {
@@ -94,6 +101,19 @@ export function ProjectFormDialog({
                   <FormLabel>{t("form.projectName")}</FormLabel>
                   <FormControl>
                     <Input placeholder={t("form.projectNamePlaceholder")} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="location"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("form.projectLocation")}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={t("form.projectLocationPlaceholder")} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

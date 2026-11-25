@@ -12,6 +12,7 @@ interface RawMember {
   name: string;
   email: string;
   role: Member["role"];
+  businessRole: string;
   customTitle: string;
   createdAt: string;
 }
@@ -45,6 +46,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     name: raw.name,
     email: raw.email,
     role: raw.role,
+    businessRole: raw.businessRole ?? "",
     customTitle: raw.customTitle ?? "",
     createdAt: raw.createdAt,
   });

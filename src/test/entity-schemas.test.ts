@@ -5,7 +5,12 @@ import {
   createMemberFormSchema,
   memberListQuerySchema,
 } from "@/entities/company-member";
-import { createTeamFormSchema } from "@/entities/team";
+import {
+  createTeamFormSchema,
+  parsePlacementKey,
+  placementOptions,
+  type Team,
+} from "@/entities/team";
 
 describe("createMemberFormSchema", () => {
   const schema = createMemberFormSchema();
@@ -45,29 +50,43 @@ describe("createMemberFormSchema", () => {
 describe("createTeamFormSchema (team-tree rule)", () => {
   const schema = createTeamFormSchema();
 
-  it("accepts a Supervision root with no parent", () => {
+  it("accepts a Package root with no parent", () => {
     expect(
-      schema.safeParse({ name: "TVGS 1", teamType: "SUPERVISION", parentTeamId: null })
+      schema.safeParse({ name: "Gói thầu 1", teamType: "PACKAGE", placementKeys: [] })
         .success,
     ).toBe(true);
   });
 
-  it("rejects a Supervision team that has a parent", () => {
+  it("rejects a Package that has a parent", () => {
     expect(
-      schema.safeParse({ name: "TVGS 1", teamType: "SUPERVISION", parentTeamId: "tea_1" })
+      schema.safeParse({ name: "Gói thầu 1", teamType: "PACKAGE", placementKeys: ["tea_1|pkg_1"] })
         .success,
     ).toBe(false);
+  });
+
+  it("rejects a Supervision team without a parent package", () => {
+    expect(
+      schema.safeParse({ name: "TVGS 1", teamType: "SUPERVISION", placementKeys: [] })
+        .success,
+    ).toBe(false);
+  });
+
+  it("accepts a Supervision team attached to a package", () => {
+    expect(
+      schema.safeParse({ name: "TVGS 1", teamType: "SUPERVISION", placementKeys: ["pkg_1|pkg_1"] })
+        .success,
+    ).toBe(true);
   });
 
   it("rejects a Contractor without a parent", () => {
     const result = schema.safeParse({
       name: "Nhà thầu A",
       teamType: "CONTRACTOR",
-      parentTeamId: null,
+      placementKeys: [],
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0]?.path).toContain("parentTeamId");
+      expect(result.error.issues[0]?.path).toContain("placementKeys");
     }
   });
 
@@ -76,9 +95,47 @@ describe("createTeamFormSchema (team-tree rule)", () => {
       schema.safeParse({
         name: "Nhà thầu A",
         teamType: "CONTRACTOR",
-        parentTeamId: "tea_1",
+        placementKeys: ["tea_1|pkg_1"],
       }).success,
     ).toBe(true);
+  });
+
+  it("accepts a Contractor under several TVGS · contract placements", () => {
+    expect(
+      schema.safeParse({
+        name: "SJC",
+        teamType: "CONTRACTOR",
+        placementKeys: ["tvgs_texo|hd_2012", "tvgs_texo|hd_2810"],
+      }).success,
+    ).toBe(true);
+  });
+});
+
+describe("placementOptions / parsePlacementKey", () => {
+  const base = { projectId: "p", memberCount: 0, createdAt: "" };
+  const teams: Team[] = [
+    { ...base, id: "hd1", name: "HĐ 1", teamType: "PACKAGE", parentTeamId: null, placements: [] },
+    { ...base, id: "hd2", name: "HĐ 2", teamType: "PACKAGE", parentTeamId: null, placements: [] },
+    {
+      ...base, id: "texo", name: "TEXO", teamType: "SUPERVISION", parentTeamId: "hd1",
+      placements: [
+        { id: "l1", parentId: "hd1", parentName: "HĐ 1", packageId: "hd1", packageName: "HĐ 1" },
+        { id: "l2", parentId: "hd2", parentName: "HĐ 2", packageId: "hd2", packageName: "HĐ 2" },
+      ],
+    },
+  ];
+
+  it("lists contracts for a Supervision team", () => {
+    expect(placementOptions("SUPERVISION", teams).map((o) => o.label)).toEqual(["HĐ 1", "HĐ 2"]);
+  });
+
+  it("lists one option per TVGS · contract for a Contractor", () => {
+    expect(placementOptions("CONTRACTOR", teams)).toEqual([
+      { key: "texo|hd1", label: "TEXO · HĐ 1" },
+      { key: "texo|hd2", label: "TEXO · HĐ 2" },
+    ]);
+    expect(parsePlacementKey("texo|hd2")).toEqual({ parentTeam: "texo", package: "hd2" });
+    expect(parsePlacementKey("texo|")).toEqual({ parentTeam: "texo", package: null });
   });
 });
 

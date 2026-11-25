@@ -24,6 +24,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/shared/ui/form";
+import { Checkbox } from "@/shared/ui/checkbox";
 import { Input } from "@/shared/ui/input";
 import {
   Select,
@@ -34,15 +35,18 @@ import {
 } from "@/shared/ui/select";
 import { useCreateTeam, useUpdateTeam } from "../model/hooks";
 import {
+  TEAM_TYPES,
   createTeamFormSchema,
+  placementKey,
+  placementOptions,
+  type Team,
   type TeamFormValues,
 } from "@/entities/team";
-import { TEAM_TYPES, type Team } from "@/entities/team";
 
 /**
- * Create a team. SUPERVISION teams are roots (no parent); CONTRACTOR/TESTING
- * teams must attach to an existing SUPERVISION (TVGS) parent — mirroring the
- * team-tree rule in the design doc.
+ * Create / edit a team. PACKAGE (Hợp đồng) teams are roots (no parent); a
+ * SUPERVISION team belongs to ONE OR MORE contracts; a CONTRACTOR/TESTING team
+ * sits under one or more "TVGS · Hợp đồng" placements (PACKAGE → SUPERVISION → NT/PTN).
  */
 export function TeamFormDialog({
   open,
@@ -55,7 +59,7 @@ export function TeamFormDialog({
   onOpenChange: (open: boolean) => void;
   projectId: string;
   teams: Team[];
-  /** Present → edit mode (rename only; type/parent are locked). */
+  /** Present → edit mode (rename + change placements; type is locked). */
   team?: Team | null;
 }) {
   const t = useTranslations("organization");
@@ -65,30 +69,64 @@ export function TeamFormDialog({
   const isEdit = Boolean(team);
   const isPending = createTeam.isPending || updateTeam.isPending;
 
-  const supervisionTeams = teams.filter((tm) => tm.teamType === "SUPERVISION");
-
   const schema = React.useMemo(() => createTeamFormSchema(t), [t]);
+  const valuesFor = React.useCallback(
+    (tm: Team | null | undefined): TeamFormValues => ({
+      name: tm?.name ?? "",
+      teamType: tm?.teamType ?? "PACKAGE",
+      placementKeys: tm?.placements.map((pl) => placementKey(pl.parentId, pl.packageId)) ?? [],
+    }),
+    [],
+  );
   const form = useForm<TeamFormValues>({
     resolver: zodResolver(schema),
-    defaultValues: {
-      name: team?.name ?? "",
-      teamType: team?.teamType ?? "SUPERVISION",
-      parentTeamId: team?.parentTeamId ?? null,
-    },
+    defaultValues: valuesFor(team),
   });
 
-  const teamType = form.watch("teamType");
-  const needsParent = teamType !== "SUPERVISION";
-
-  // Clear the parent when switching to a root type (create mode only).
+  // Dialog luôn được mount sẵn → defaultValues chỉ chạy 1 lần. Mỗi lần MỞ (hoặc đổi
+  // nhóm đang sửa) phải nạp lại tên + các vị trí hiện có của nhóm đó.
+  const teamId = team?.id;
   React.useEffect(() => {
-    if (!isEdit && !needsParent) form.setValue("parentTeamId", null);
-  }, [isEdit, needsParent, form]);
+    if (open) form.reset(valuesFor(team));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- chỉ nạp lại khi mở / đổi nhóm
+  }, [open, teamId]);
+
+  const teamType = form.watch("teamType");
+  const needsParent = teamType !== "PACKAGE";
+  // TVGS → các Hợp đồng; Nhà Thầu/Thí Nghiệm → các cặp "TVGS · Hợp đồng".
+  // Khi sửa: vị trí đang có mà không còn trong danh sách (dữ liệu cũ) vẫn hiện để bỏ chọn được.
+  const parentOptions = React.useMemo(() => {
+    const opts = placementOptions(teamType, teams);
+    const known = new Set(opts.map((o) => o.key));
+    const stray = (team?.placements ?? [])
+      .map((pl) => ({
+        key: placementKey(pl.parentId, pl.packageId),
+        label:
+          teamType === "SUPERVISION" || !pl.packageName
+            ? pl.parentName
+            : `${pl.parentName} · ${pl.packageName}`,
+      }))
+      .filter((o) => !known.has(o.key));
+    return [...opts, ...stray];
+  }, [teamType, teams, team]);
+
+  // Đổi loại nhóm (chỉ khi tạo) → xoá vị trí đã chọn: cha hợp lệ của loại này không
+  // hợp lệ cho loại khác (vd Hợp đồng làm cha của Nhà Thầu).
+  const typeChanged = React.useRef(false);
+  React.useEffect(() => {
+    if (isEdit) return;
+    if (typeChanged.current) form.setValue("placementKeys", []);
+    typeChanged.current = true;
+  }, [isEdit, teamType, form]);
 
   function onSubmit(values: TeamFormValues) {
     if (team) {
       updateTeam.mutate(
-        { id: team.id, name: values.name },
+        {
+          id: team.id,
+          name: values.name,
+          ...(needsParent ? { placementKeys: values.placementKeys } : {}),
+        },
         { onSuccess: () => onOpenChange(false) },
       );
     } else {
@@ -103,7 +141,7 @@ export function TeamFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg">
             {isEdit ? t("teams.edit") : t("teams.add")}
@@ -111,7 +149,7 @@ export function TeamFormDialog({
           <DialogDescription>{t("teams.formDescription")}</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4" noValidate>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid min-w-0 gap-4 *:min-w-0" noValidate>
             {!isEdit ? (
               <FormField
                 control={form.control}
@@ -121,8 +159,8 @@ export function TeamFormDialog({
                     <FormLabel>{t("form.teamType")}</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue />
+                        <SelectTrigger className="w-full min-w-0">
+                          <SelectValue className="block! min-w-0 truncate" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -139,30 +177,44 @@ export function TeamFormDialog({
               />
             ) : null}
 
-            {!isEdit && needsParent ? (
+            {needsParent ? (
               <FormField
                 control={form.control}
-                name="parentTeamId"
+                name="placementKeys"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t("form.parentTeam")}</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      value={field.value ?? undefined}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder={t("form.parentTeamPlaceholder")} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {supervisionTeams.map((tm) => (
-                          <SelectItem key={tm.id} value={tm.id}>
-                            {tm.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {parentOptions.length === 0 ? (
+                      <p className="text-muted-foreground text-sm">
+                        {t("form.parentTeamEmpty")}
+                      </p>
+                    ) : (
+                      <div className="grid max-h-56 min-w-0 grid-cols-1 gap-1 overflow-y-auto rounded-md border p-2">
+                        {parentOptions.map((opt) => {
+                          const checked = field.value.includes(opt.key);
+                          return (
+                            <label
+                              key={opt.key}
+                              className="hover:bg-muted flex min-w-0 cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm"
+                              title={opt.label}
+                            >
+                              <Checkbox
+                                className="shrink-0"
+                                checked={checked}
+                                onCheckedChange={(next) =>
+                                  field.onChange(
+                                    next
+                                      ? [...field.value, opt.key]
+                                      : field.value.filter((k) => k !== opt.key),
+                                  )
+                                }
+                              />
+                              <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
                     <FormDescription>{t("form.parentTeamHint")}</FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -199,7 +251,7 @@ export function TeamFormDialog({
               <Button
                 type="submit"
                 disabled={
-                  isPending || (!isEdit && needsParent && supervisionTeams.length === 0)
+                  isPending || (needsParent && parentOptions.length === 0)
                 }
               >
                 {isPending ? <Loader2 className="animate-spin" /> : null}

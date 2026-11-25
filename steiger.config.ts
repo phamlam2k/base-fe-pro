@@ -30,6 +30,19 @@ export default defineConfig([
       // legitimately have a single current consumer — that's extensibility
       // surface, not an accident.
       "fsd/insignificant-slice": "off",
+
+      // Same rationale for the pages layer: Madoka is a multi-screen business
+      // app (acceptance, biên bản, nhật ký, admin…) — page slices grow 1:1 with
+      // screens. The 20-slice threshold is advisory; grouping would add path
+      // indirection without architectural benefit here.
+      "fsd/excessive-slicing": "off",
+
+      // Cosmetic pluralization check. The `equipment` entity (MAD-25) is an
+      // UNCOUNTABLE noun that the underlying `pluralize` lib misreads as plural
+      // (there is no "equipments"). The name matches the backend app
+      // (`apps.equipment`), route (`/equipment`) and permission (`equipment:*`),
+      // so it stays singular-by-meaning. Off to avoid this false positive.
+      "fsd/inconsistent-naming": "off",
     },
   },
 

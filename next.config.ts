@@ -6,6 +6,8 @@ const withNextIntl = createNextIntlPlugin("./src/shared/config/i18n/request.ts")
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Runtime image gọn cho Docker: chỉ cần .next/standalone + static + public.
+  output: "standalone",
 };
 
 export default withNextIntl(nextConfig);

@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { can } from "@/shared/config/permissions";
+import { can, canViewProjects } from "@/shared/config/permissions";
 import {
   ROUTES,
+  defaultLandingFor,
   isPublicRoute,
   requiredPermissionFor,
 } from "@/shared/config/routes";
@@ -24,7 +25,9 @@ export function proxy(request: NextRequest) {
 
   if (isPublicRoute(pathname)) {
     if (session) {
-      return NextResponse.redirect(new URL(ROUTES.dashboard, request.url));
+      return NextResponse.redirect(
+        new URL(defaultLandingFor(session.role), request.url),
+      );
     }
     return NextResponse.next();
   }
@@ -35,6 +38,28 @@ export function proxy(request: NextRequest) {
       loginUrl.searchParams.set("redirect", pathname);
     }
     return NextResponse.redirect(loginUrl);
+  }
+
+  // MAD-36: tài khoản phải đổi mật khẩu (lần đầu / sau khi Admin reset) bị chặn
+  // ở mọi trang cho tới khi đổi xong. Chỉ cho ở đúng trang /change-password.
+  const onChangePassword = pathname === ROUTES.changePassword;
+  if (session.mustChangePassword && !onChangePassword) {
+    return NextResponse.redirect(new URL(ROUTES.changePassword, request.url));
+  }
+  // Đã đổi xong (hoặc không cần) mà vẫn ở /change-password → đưa về trang mặc định.
+  if (!session.mustChangePassword && onChangePassword) {
+    return NextResponse.redirect(
+      new URL(defaultLandingFor(session.role), request.url),
+    );
+  }
+
+  // "Quản lý dự án": chỉ quản trị công ty (admin/manager) hoặc Chủ đầu tư
+  // (madokaRole investor). Cần madokaRole nên không dùng ROUTE_PERMISSIONS thuần.
+  if (pathname.startsWith(ROUTES.projectManagement)) {
+    if (!canViewProjects(session.role, session.madokaRole)) {
+      return NextResponse.redirect(new URL(ROUTES.forbidden, request.url));
+    }
+    return NextResponse.next();
   }
 
   const requiredPermission = requiredPermissionFor(pathname);

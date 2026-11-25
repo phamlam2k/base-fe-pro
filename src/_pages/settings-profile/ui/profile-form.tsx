@@ -8,6 +8,9 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { userApi } from "@/entities/user";
+import { isApiError } from "@/shared/api/axios";
+import { useSession } from "@/entities/session";
 import { Button } from "@/shared/ui/button";
 import {
   Card,
@@ -27,7 +30,16 @@ import {
 } from "@/shared/ui/form";
 import { Input } from "@/shared/ui/input";
 import { Textarea } from "@/shared/ui/textarea";
-import { useSession } from "@/entities/session";
+
+const profileFormSchema = z.object({
+  fullName: z.string().min(2),
+  phone: z.string().max(30),
+  dateOfBirth: z.string(),
+  idNumber: z.string().max(20),
+  address: z.string().max(500),
+});
+
+type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
   const t = useTranslations("settings");
@@ -35,26 +47,34 @@ export function ProfileForm() {
   const { user } = useSession();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  const schema = React.useMemo(
-    () =>
-      z.object({
-        name: z.string().min(2, { message: t("validation.nameMin") }),
-        bio: z.string().max(240, { message: t("validation.bioMax") }),
-      }),
-    [t],
-  );
-
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-    defaultValues: { name: user.name, bio: "" },
+  const form = useForm<ProfileFormValues>({
+    resolver: zodResolver(profileFormSchema),
+    defaultValues: {
+      fullName: user.name ?? "",
+      phone: user.phone ?? "",
+      dateOfBirth: user.dateOfBirth ?? "",
+      idNumber: user.idNumber ?? "",
+      address: user.address ?? "",
+    },
   });
 
-  async function onSubmit() {
+  async function onSubmit(values: ProfileFormValues) {
     setIsSubmitting(true);
-    // Mock persistence — wire to PATCH /users/:id (or /auth/me) in real apps.
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsSubmitting(false);
-    toast.success(t("profileUpdated"));
+    try {
+      await userApi.updateProfile({
+        fullName: values.fullName,
+        phone: values.phone || undefined,
+        dateOfBirth: values.dateOfBirth || undefined,
+        idNumber: values.idNumber || undefined,
+        address: values.address || undefined,
+      });
+      toast.success(t("profileUpdated"));
+    } catch (err) {
+      const message = isApiError(err) ? err.message : t("profileUpdateFailed");
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -72,7 +92,7 @@ export function ProfileForm() {
           >
             <FormField
               control={form.control}
-              name="name"
+              name="fullName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("profileName")}</FormLabel>
@@ -92,13 +112,55 @@ export function ProfileForm() {
 
             <FormField
               control={form.control}
-              name="bio"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("profileBio")}</FormLabel>
+                  <FormLabel>{t("profilePhone")}</FormLabel>
+                  <FormControl>
+                    <Input type="tel" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dateOfBirth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("profileDateOfBirth")}</FormLabel>
+                  <FormControl>
+                    <Input type="date" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="idNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("profileIdNumber")}</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{t("profileAddress")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder={t("profileBioPlaceholder")}
+                      placeholder={t("profileAddressPlaceholder")}
                       rows={3}
                       {...field}
                     />

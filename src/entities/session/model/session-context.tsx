@@ -15,6 +15,12 @@ export interface SessionUser {
   email: string;
   name: string;
   role: Role;
+  /** Vai trò nghiệp vụ Madoka (TVGS/NT/PTN/CĐT/Admin) — gating màn nghiệp vụ. */
+  madokaRole?: string;
+  phone?: string | null;
+  dateOfBirth?: string | null;
+  idNumber?: string | null;
+  address?: string | null;
 }
 
 interface SessionContextValue {

@@ -20,18 +20,26 @@ import {
 import { NAV_GROUPS } from "@/shared/config/nav";
 import { ROUTES } from "@/shared/config/routes";
 import { siteConfig } from "@/shared/config/site";
-import { usePermission } from "@/entities/session";
+import { canAccessAcceptance } from "@/shared/config/acceptance-access";
+import { canViewProjects } from "@/shared/config/permissions";
+import { usePermission, useSession } from "@/entities/session";
 
 export function AppSidebar() {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const { can } = usePermission();
+  const { user } = useSession();
 
   // Hide items (and whole groups) the current role cannot access.
+  // 2 lớp: permission (3 app-role) + acceptanceKey (vai trò Madoka — MAD-4).
   const visibleGroups = NAV_GROUPS.map((group) => ({
     ...group,
     items: group.items.filter(
-      (item) => !item.permission || can(item.permission),
+      (item) =>
+        (!item.permission || can(item.permission)) &&
+        (!item.acceptanceKey ||
+          canAccessAcceptance(user.role, user.madokaRole, item.acceptanceKey)) &&
+        (!item.projectAccess || canViewProjects(user.role, user.madokaRole)),
     ),
   })).filter((group) => group.items.length > 0);
 

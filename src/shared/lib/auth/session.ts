@@ -11,6 +11,10 @@ export interface SessionUser {
   email: string;
   name: string;
   role: Role;
+  /** Vai trò nghiệp vụ Madoka (TVGS/NT/PTN/CĐT/Admin). Dùng gating màn nghiệp vụ. */
+  madokaRole: string;
+  /** MAD-36: buộc đổi mật khẩu trước khi dùng hệ thống. */
+  mustChangePassword: boolean;
 }
 
 /**
@@ -26,5 +30,7 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
     email: payload.email,
     name: payload.name,
     role: payload.role,
+    madokaRole: payload.madokaRole ?? "",
+    mustChangePassword: payload.mustChangePassword ?? false,
   };
 }

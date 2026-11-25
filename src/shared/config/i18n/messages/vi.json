@@ -33,7 +33,13 @@
     "notFoundDescription": "Trang bạn tìm kiếm không tồn tại hoặc đã bị di chuyển.",
     "backToDashboard": "Về trang tổng quan",
     "close": "Đóng",
-    "download": "Tải xuống"
+    "download": "Tải xuống",
+    "previousImage": "Ảnh trước",
+    "nextImage": "Ảnh sau",
+    "zoomIn": "Phóng to",
+    "zoomOut": "Thu nhỏ",
+    "resetZoom": "Về kích thước gốc",
+    "imageCounter": "Ảnh {current}/{total}"
   },
   "nav": {
     "overview": "Tổng quan",
@@ -537,7 +543,7 @@
       "emptyType": "Chưa có nhóm loại này.",
       "deleteTitle": "Xóa nhóm {name}?",
       "deleteDescription": "Nhóm và toàn bộ thành viên của nhóm sẽ bị xóa. Không thể hoàn tác.",
-      "deleteRootDescription": "Đây là nhóm gốc (Hợp đồng / TVGS) — xóa nó sẽ xóa LUÔN mọi nhóm con và thành viên bên dưới. Không thể hoàn tác."
+      "deleteRootDescription": "Đây là nhóm gốc (Hợp đồng / TVGS) — nhóm con KHÔNG còn thuộc nhóm cha nào khác sẽ bị xóa theo cùng thành viên; nhóm con còn thuộc hợp đồng / TVGS khác được giữ lại. Không thể hoàn tác."
     },
     "form": {
       "name": "Họ tên",
@@ -558,11 +564,12 @@
       "teamName": "Tên nhóm",
       "teamNamePlaceholder": "VD: TVGS Nhóm 1 — Kết cấu",
       "teamType": "Loại nhóm",
-      "parentTeam": "Nhóm cha",
+      "parentTeam": "Thuộc (chọn một hoặc nhiều)",
       "parentTeamPlaceholder": "Chọn nhóm cha",
-      "parentTeamHint": "TVGS thuộc một Hợp đồng; Nhà Thầu / Thí Nghiệm thuộc một nhóm TVGS.",
+      "parentTeamHint": "TVGS chọn các Hợp đồng mình giám sát; Nhà Thầu / Thí Nghiệm chọn các cặp “TVGS · Hợp đồng” mình tham gia. Nhà thầu chỉ thấy đúng các hợp đồng đã chọn.",
       "person": "Người dùng",
-      "personHint": "Chọn từ tài khoản đã có. Chưa có? Tạo ở trang Quản lý người dùng trước."
+      "personHint": "Chọn từ tài khoản đã có. Chưa có? Tạo ở trang Quản lý người dùng trước.",
+      "parentTeamEmpty": "Chưa có nhóm cha phù hợp — tạo Hợp đồng / nhóm TVGS trước."
     },
     "toasts": {
       "companyCreated": "Đã tạo công ty",
@@ -590,7 +597,7 @@
       "projectNameMin": "Tên dự án tối thiểu 2 ký tự",
       "teamNameMin": "Tên nhóm tối thiểu 2 ký tự",
       "teamTypeRequired": "Vui lòng chọn loại nhóm",
-      "parentRequired": "Nhà Thầu / Thí Nghiệm phải thuộc một nhóm TVGS cha"
+      "parentRequired": "TVGS phải thuộc ít nhất một Hợp đồng; Nhà Thầu / Thí Nghiệm phải thuộc ít nhất một cặp TVGS · Hợp đồng"
     },
     "guide": {
       "rolesTitle": "Các vai trò trong hệ thống",
@@ -687,7 +694,8 @@
     "titleFor": "Khu vực — {name}",
     "description": "Vẽ ranh giới các khu vực dự án trên bản đồ. App mobile dùng để kiểm tra ảnh hiện trường có chụp trong khu vực hay không. Một dự án có thể có nhiều vùng.",
     "back": "Quay lại",
-    "searchPlaceholder": "Tìm đường, phường/xã hoặc địa điểm…",
+    "searchPlaceholder": "Tìm địa điểm hoặc dán toạ độ Google Maps (vd 20.8573, 106.0118)…",
+    "goToCoords": "Đi tới toạ độ {lat}, {lng}",
     "basemap": {
       "satellite": "Vệ tinh",
       "street": "Bản đồ đường"
@@ -842,6 +850,7 @@
     "workDescription": "Đối tượng nghiệm thu",
     "workDescriptionPlaceholder": "VD: Đổ bê tông sàn tầng 5, khu A1-A4",
     "proposedAt": "Thời gian bắt đầu nghiệm thu",
+    "proposedAtHint": "Tối thiểu sau 24 giờ kể từ bây giờ để TVGS kịp xác nhận.",
     "photos": "Ảnh hiện trạng",
     "viewInvoice": "Xem hóa đơn / CO-CQ (PDF)",
     "photosHint": "Đính kèm ảnh sẽ bổ sung khi nối camera pipeline.",
@@ -856,7 +865,8 @@
       "teamRequired": "Chọn team Nhà thầu",
       "descriptionRequired": "Nhập mô tả công việc",
       "materialRequired": "Nhập chủng loại vật liệu",
-      "quantityRequired": "Nhập khối lượng"
+      "quantityRequired": "Nhập khối lượng",
+      "proposedAtMin": "Thời gian bắt đầu nghiệm thu phải sau hiện tại ít nhất 24 giờ"
     },
     "inboxTitle": "Hộp thư yêu cầu nghiệm thu",
     "newRequest": "Tạo yêu cầu nghiệm thu",
@@ -869,7 +879,8 @@
     "colContractor": "Nhà thầu",
     "colStatus": "Trạng thái",
     "needsPtn": "Cần PTN",
-    "loading": "Đang tải…",    "empty": "Không có phiếu nào.",
+    "loading": "Đang tải…",
+    "empty": "Không có phiếu nào.",
     "materialAndQuantity": "Chủng loại / khối lượng",
     "history": "Lịch sử xử lý",
     "ptnStatus": "PTN: {status}",
@@ -952,7 +963,17 @@
     "overdueInspectionNote": "Đã quá thời gian bắt đầu nghiệm thu — không thể xác nhận. Nhà thầu cần tạo lại phiếu.",
     "overdueInspectionBlocked": "Đã quá hạn nghiệm thu — vui lòng chỉnh lại thời gian nghiệm thu trước khi thực hiện.",
     "needResultFileFirst": "Cần file kết quả thí nghiệm — nhà thầu chưa nộp file kết quả.",
-    "gpsRequiredInspect": "Cần cấp quyền vị trí (GPS) để nghiệm thu hiện trường. Vui lòng cho phép truy cập vị trí rồi bấm lại.",
+    "gpsDeniedTitle": "Cần cấp quyền vị trí (GPS)",
+    "gpsDeniedDesc": "Nghiệm thu hiện trường bắt buộc xác định vị trí của bạn. Bấm Thử lại; nếu trình duyệt hỏi thì chọn Cho phép. Nếu trình duyệt không hỏi, hãy bật thủ công:",
+    "gpsDeniedDescNative": "Nghiệm thu hiện trường bắt buộc xác định vị trí của bạn. Bấm nút vị trí bên dưới, rồi chọn Cho phép trong hộp thoại của trình duyệt.",
+    "gpsDeniedStep1": "Bấm biểu tượng bên trái địa chỉ trang web, trên thanh địa chỉ.",
+    "gpsDeniedStep2": "Tìm mục Vị trí và chọn Cho phép.",
+    "gpsDeniedStep3": "Quay lại đây và bấm Thử lại.",
+    "gpsUnavailableTitle": "Chưa lấy được vị trí",
+    "gpsUnavailableDesc": "Thiết bị chưa xác định được vị trí của bạn. Hãy bật dịch vụ định vị trên máy, kiểm tra kết nối mạng rồi bấm Thử lại.",
+    "gpsLater": "Để sau",
+    "gpsRetry": "Thử lại",
+    "gpsChecking": "Đang lấy vị trí…",
     "gpsOutsideZone": "Bạn đang ở NGOÀI vùng dự án — không thể nghiệm thu hiện trường.",
     "testingConfirmed": "PTN đã xác nhận yêu cầu",
     "resultUploaded": "Đã nộp file kết quả",
@@ -983,7 +1004,8 @@
     "colItem": "Hạng mục",
     "colTime": "Thời gian",
     "colStatus": "Trạng thái",
-    "loading": "Đang tải…",    "empty": "Chưa có biên bản nào.",
+    "loading": "Đang tải…",
+    "empty": "Chưa có biên bản nào.",
     "fieldInspectionPhotos": "Ảnh hiện trường nghiệm thu",
     "requestPhotos": "Ảnh hiện trạng (phiếu yêu cầu)",
     "confirmation": "Xác nhận",
@@ -1017,7 +1039,8 @@
     "exporting": "Đang xuất…",
     "selectedCount": "{count} đã chọn",
     "selectToExport": "Chọn ít nhất 1 nhật ký để xuất.",
-    "loading": "Đang tải…",    "empty": "Chưa có nhật ký.",
+    "loading": "Đang tải…",
+    "empty": "Chưa có nhật ký.",
     "logOfDate": "Nhật ký · {date}",
     "contractor": "Nhà thầu",
     "weather": "Thời tiết",

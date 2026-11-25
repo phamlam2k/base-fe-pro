@@ -9,6 +9,9 @@ export interface Project {
   companyId: string;
   name: string;
   status: ProjectStatus;
+  // Địa điểm + Gói thầu cấp dự án (nhập 1 lần) → tự điền vào mẫu PDF.
+  location: string;
+  contractPackage: string;
   teamCount: number;
   createdAt: string;
 }
@@ -21,6 +24,8 @@ export function createProjectFormSchema(t?: TFn) {
     name: z
       .string()
       .min(2, { message: msg("validation.projectNameMin", "Tên dự án tối thiểu 2 ký tự") }),
+    location: z.string().max(255).optional(),
+    contractPackage: z.string().max(255).optional(),
   });
 }
 export type ProjectFormValues = z.infer<ReturnType<typeof createProjectFormSchema>>;

@@ -16,6 +16,11 @@ export const projectApi = {
     });
     return res.data.data;
   },
+  /** Dự án của user hiện tại (accessible) — cho thanh chọn dự án; mọi vai trò gọi được. */
+  myList: async (): Promise<Project[]> => {
+    const res = await apiClient.get<ApiResponse<Project[]>>("/my-projects");
+    return res.data.data;
+  },
   create: async (companyId: string, input: ProjectFormValues): Promise<Project> => {
     const res = await apiClient.post<ApiResponse<Project>>("/organization/projects", {
       ...input,

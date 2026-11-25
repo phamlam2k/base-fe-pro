@@ -7,7 +7,7 @@ import type { Company } from "@/entities/company";
 type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
-  const auth = requireAuth(request, "orgs:manage");
+  const auth = requireAuth(request, "companies:manage");
   if ("response" in auth) return auth.response;
 
   const { id } = await params;

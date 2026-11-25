@@ -1,5 +1,7 @@
 import {
+  ClipboardCheck,
   FileText,
+  FolderTree,
   LayoutDashboard,
   ListChecks,
   Palette,
@@ -10,6 +12,7 @@ import {
 } from "lucide-react";
 
 import type { Permission } from "@/shared/config/permissions";
+import type { AcceptanceScreen } from "@/shared/config/acceptance-access";
 import { ROUTES } from "@/shared/config/routes";
 
 /**
@@ -22,6 +25,13 @@ export interface NavItem {
   href: string;
   icon: LucideIcon;
   permission?: Permission;
+  /** Gating theo vai trò Madoka cho màn nghiệp vụ (MAD-4). */
+  acceptanceKey?: AcceptanceScreen;
+  /**
+   * Chỉ hiện với người xem được "Quản lý dự án": admin/manager (quản trị) hoặc
+   * Chủ đầu tư (madokaRole investor) — dùng canViewProjects() ở sidebar.
+   */
+  projectAccess?: boolean;
 }
 
 export interface NavGroup {
@@ -42,6 +52,39 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    titleKey: "madoka",
+    items: [
+      {
+        titleKey: "overview",
+        href: ROUTES.overview,
+        icon: LayoutDashboard,
+        permission: "acceptance:view",
+        acceptanceKey: "overview",
+      },
+      {
+        titleKey: "acceptanceRequests",
+        href: ROUTES.acceptanceRequests,
+        icon: ClipboardCheck,
+        permission: "acceptance:view",
+        acceptanceKey: "requests",
+      },
+      {
+        titleKey: "constructionLogs",
+        href: ROUTES.constructionLogs,
+        icon: ListChecks,
+        permission: "acceptance:view",
+        acceptanceKey: "requests",
+      },
+      {
+        titleKey: "acceptanceRecords",
+        href: ROUTES.acceptanceRecords,
+        icon: FileText,
+        permission: "acceptance:view",
+        acceptanceKey: "records",
+      },
+    ],
+  },
+  {
     titleKey: "management",
     items: [
       {
@@ -49,6 +92,12 @@ export const NAV_GROUPS: NavGroup[] = [
         href: ROUTES.organization,
         icon: ShieldCheck,
         permission: "orgs:view",
+      },
+      {
+        titleKey: "projectManagement",
+        href: ROUTES.projectManagement,
+        icon: FolderTree,
+        projectAccess: true,
       },
       {
         titleKey: "users",
@@ -87,6 +136,29 @@ export const NAV_GROUPS: NavGroup[] = [
         href: ROUTES.settingsProfile,
         icon: UserCircle,
         permission: "settings:view",
+      },
+    ],
+  },
+  {
+    titleKey: "pdfForms",
+    items: [
+      {
+        titleKey: "pdfFormFill",
+        href: ROUTES.pdfForms,
+        icon: FileText,
+        permission: "acceptance:view",
+      },
+      {
+        titleKey: "pdfTemplates",
+        href: ROUTES.pdfTemplates,
+        icon: FileText,
+        permission: "pdf-forms:manage",
+      },
+      {
+        titleKey: "pdfTemplateMapping",
+        href: ROUTES.pdfTemplateMapping,
+        icon: FileText,
+        permission: "pdf-forms:manage",
       },
     ],
   },

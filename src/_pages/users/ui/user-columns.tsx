@@ -2,7 +2,9 @@
 
 import { MoreHorizontal, Pencil, ShieldCheck, Trash2 } from "lucide-react";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+
+import { formatDate } from "@/shared/lib/format-date";
 
 import { Avatar, AvatarFallback } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
@@ -19,7 +21,14 @@ import { usePermission } from "@/entities/session";
 import { cn } from "@/shared/lib/utils";
 import type { User } from "@/entities/user";
 
-function RoleBadge({ isSuperAdmin }: { isSuperAdmin: boolean }) {
+/** Cột "Quyền": SuperAdmin > Quản trị viên (COMPANY_ADMIN/DELEGATE) > Nhân viên. */
+function PermBadge({
+  isSuperAdmin,
+  companyRole,
+}: {
+  isSuperAdmin: boolean;
+  companyRole?: string;
+}) {
   const t = useTranslations("users");
   if (isSuperAdmin) {
     return (
@@ -29,7 +38,22 @@ function RoleBadge({ isSuperAdmin }: { isSuperAdmin: boolean }) {
       </Badge>
     );
   }
-  return <Badge variant="outline">{t("normalUser")}</Badge>;
+  if (companyRole === "COMPANY_ADMIN" || companyRole === "COMPANY_DELEGATE") {
+    return (
+      <Badge variant="secondary" className="gap-1">
+        <ShieldCheck className="size-3.5" />
+        {t("perm_admin")}
+      </Badge>
+    );
+  }
+  return <Badge variant="outline">{t("perm_staff")}</Badge>;
+}
+
+/** Cột "Vai trò nghiệp vụ": CĐT/TVGS/NT/PTN/Quản trị hệ thống (User.role). */
+function BusinessRoleCell({ role }: { role: string }) {
+  const t = useTranslations("users");
+  if (!role) return <span className="text-muted-foreground">—</span>;
+  return <Badge variant="outline">{t(`role_${role}`)}</Badge>;
 }
 
 function ActiveBadge({ isActive }: { isActive: boolean }) {
@@ -48,10 +72,9 @@ function ActiveBadge({ isActive }: { isActive: boolean }) {
 }
 
 function JoinedCell({ value }: { value: string }) {
-  const format = useFormatter();
   return (
     <span className="text-muted-foreground">
-      {format.dateTime(new Date(value), { dateStyle: "medium" })}
+      {formatDate(value)}
     </span>
   );
 }
@@ -148,9 +171,19 @@ export function getUserColumns({
       ),
     },
     {
+      accessorKey: "role",
+      header: t("businessRoleColumn"),
+      cell: ({ row }) => <BusinessRoleCell role={row.original.role} />,
+    },
+    {
       accessorKey: "isSuperAdmin",
       header: t("roleColumn"),
-      cell: ({ row }) => <RoleBadge isSuperAdmin={row.original.isSuperAdmin} />,
+      cell: ({ row }) => (
+        <PermBadge
+          isSuperAdmin={row.original.isSuperAdmin}
+          companyRole={row.original.companyRole}
+        />
+      ),
     },
     {
       accessorKey: "isActive",

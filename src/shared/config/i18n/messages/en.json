@@ -33,7 +33,13 @@
     "notFoundDescription": "The page you are looking for does not exist or has been moved.",
     "backToDashboard": "Back to dashboard",
     "close": "Close",
-    "download": "Download"
+    "download": "Download",
+    "previousImage": "Previous image",
+    "nextImage": "Next image",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "resetZoom": "Reset zoom",
+    "imageCounter": "Image {current} of {total}"
   },
   "nav": {
     "overview": "Overview",
@@ -537,7 +543,7 @@
       "emptyType": "No teams of this type yet.",
       "deleteTitle": "Delete team {name}?",
       "deleteDescription": "The team and all its members will be deleted. This cannot be undone.",
-      "deleteRootDescription": "This is a root team (Contract / Supervision) — deleting it ALSO deletes every child team and their members below it. This cannot be undone."
+      "deleteRootDescription": "This is a root team (Contract / Supervision) — child teams with no other parent are deleted with their members; children that still belong to another contract / supervision are kept. This cannot be undone."
     },
     "form": {
       "name": "Full name",
@@ -558,11 +564,12 @@
       "teamName": "Team name",
       "teamNamePlaceholder": "e.g. Supervision Team 1 — Structure",
       "teamType": "Team type",
-      "parentTeam": "Parent team",
+      "parentTeam": "Belongs to (one or more)",
       "parentTeamPlaceholder": "Pick a parent team",
-      "parentTeamHint": "Supervision belongs to a Contract; Contractor / Testing belong to a Supervision.",
+      "parentTeamHint": "Supervision picks the Contracts it supervises; Contractor / Testing pick the “Supervision · Contract” pairs they work under. A contractor only sees the contracts picked here.",
       "person": "User",
-      "personHint": "Pick from existing accounts. None yet? Create one in User management first."
+      "personHint": "Pick from existing accounts. None yet? Create one in User management first.",
+      "parentTeamEmpty": "No suitable parent yet — create a Contract / Supervision team first."
     },
     "toasts": {
       "companyCreated": "Company created",
@@ -590,7 +597,7 @@
       "projectNameMin": "Project name must be at least 2 characters",
       "teamNameMin": "Team name must be at least 2 characters",
       "teamTypeRequired": "Please select a team type",
-      "parentRequired": "Contractor / Testing must belong to a Supervision parent"
+      "parentRequired": "Supervision needs at least one Contract; Contractor / Testing need at least one Supervision · Contract pair"
     },
     "guide": {
       "rolesTitle": "Roles in the system",
@@ -687,7 +694,8 @@
     "titleFor": "Zones — {name}",
     "description": "Draw the site boundaries on the map. Mobile uses them to check that site photos were taken inside an area. A project can have several zones.",
     "back": "Back",
-    "searchPlaceholder": "Search a road, ward or place…",
+    "searchPlaceholder": "Search a place or paste Google Maps coordinates (e.g. 20.8573, 106.0118)…",
+    "goToCoords": "Go to coordinates {lat}, {lng}",
     "basemap": {
       "satellite": "Satellite",
       "street": "Street map"
@@ -842,6 +850,7 @@
     "workDescription": "Acceptance subject",
     "workDescriptionPlaceholder": "E.g. Pour floor slab F5, zone A1-A4",
     "proposedAt": "Inspection start time",
+    "proposedAtHint": "At least 24 hours from now so the supervisor has time to confirm.",
     "photos": "Site photos",
     "viewInvoice": "View invoice / CO-CQ (PDF)",
     "photosHint": "Photo attachment coming with the camera pipeline.",
@@ -856,7 +865,8 @@
       "teamRequired": "Select a contractor team",
       "descriptionRequired": "Enter a work description",
       "materialRequired": "Enter the material type",
-      "quantityRequired": "Enter the quantity"
+      "quantityRequired": "Enter the quantity",
+      "proposedAtMin": "Inspection start time must be at least 24 hours from now"
     },
     "inboxTitle": "Acceptance request inbox",
     "newRequest": "Create acceptance request",
@@ -869,7 +879,8 @@
     "colContractor": "Contractor",
     "colStatus": "Status",
     "needsPtn": "Needs PTN",
-    "loading": "Loading…",    "empty": "No requests.",
+    "loading": "Loading…",
+    "empty": "No requests.",
     "materialAndQuantity": "Material / quantity",
     "history": "Processing history",
     "ptnStatus": "PTN: {status}",
@@ -952,7 +963,17 @@
     "overdueInspectionNote": "Past the inspection start time — cannot confirm. The contractor must create a new request.",
     "overdueInspectionBlocked": "Inspection is overdue — please reschedule the inspection time before proceeding.",
     "needResultFileFirst": "Lab result file required — the contractor has not uploaded a result file yet.",
-    "gpsRequiredInspect": "Location (GPS) permission is required for field acceptance. Please allow location access and try again.",
+    "gpsDeniedTitle": "Location (GPS) permission required",
+    "gpsDeniedDesc": "Field acceptance needs your location. Click Try again and choose Allow if the browser asks. If it does not ask, enable it manually:",
+    "gpsDeniedDescNative": "Field acceptance needs your location. Click the location button below, then choose Allow in the browser dialog.",
+    "gpsDeniedStep1": "Click the icon to the left of the site address in the address bar.",
+    "gpsDeniedStep2": "Find Location and choose Allow.",
+    "gpsDeniedStep3": "Come back here and click Try again.",
+    "gpsUnavailableTitle": "Could not get your location",
+    "gpsUnavailableDesc": "Your device could not determine your location. Turn on location services, check your network connection, then click Try again.",
+    "gpsLater": "Later",
+    "gpsRetry": "Try again",
+    "gpsChecking": "Getting location…",
     "gpsOutsideZone": "You are OUTSIDE the project zone — cannot perform field acceptance.",
     "testingConfirmed": "Lab confirmed the request",
     "resultUploaded": "Result file uploaded",
@@ -983,7 +1004,8 @@
     "colItem": "Item",
     "colTime": "Time",
     "colStatus": "Status",
-    "loading": "Loading…",    "empty": "No records yet.",
+    "loading": "Loading…",
+    "empty": "No records yet.",
     "fieldInspectionPhotos": "Field inspection photos",
     "requestPhotos": "Site photos (request)",
     "confirmation": "Confirmation",
@@ -1017,7 +1039,8 @@
     "exporting": "Exporting…",
     "selectedCount": "{count} selected",
     "selectToExport": "Select at least 1 log to export.",
-    "loading": "Loading…",    "empty": "No logs yet.",
+    "loading": "Loading…",
+    "empty": "No logs yet.",
     "logOfDate": "Log · {date}",
     "contractor": "Contractor",
     "weather": "Weather",

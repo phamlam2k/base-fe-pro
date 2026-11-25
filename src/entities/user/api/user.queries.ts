@@ -23,10 +23,10 @@ export const userQueries = {
     }),
 
   lookups: () => [...userQueries.all(), "lookup"] as const,
-  lookup: (search: string) =>
+  lookup: (search: string, role?: string) =>
     queryOptions({
-      queryKey: [...userQueries.lookups(), search],
-      queryFn: () => userApi.lookup(search),
+      queryKey: [...userQueries.lookups(), search, role ?? null],
+      queryFn: () => userApi.lookup(search, role),
       placeholderData: keepPreviousData,
     }),
 };

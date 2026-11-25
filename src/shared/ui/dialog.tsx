@@ -51,19 +51,55 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  overlayClassName,
+  onInteractOutside,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
   showCloseButton?: boolean
+  overlayClassName?: string
 }) {
+  // Fix Radix: khi có 1 popup (Select/Dropdown/Popover) MODAL đang mở bên trong
+  // Dialog, click ra ngoài popup (overlay / vùng trống) phải đóng ĐÚNG popup và GIỮ
+  // Dialog. Vấn đề: Select tự đóng trước → tới lượt Dialog.onInteractOutside thì popup
+  // đã biến mất khỏi DOM (race) → guard querySelector(POPUP) trượt → Dialog đóng theo.
+  // Cách xử lý: ở pha capture (chạy TRƯỚC Radix) ghi lại "lúc bấm có popup mở không"
+  // vào ref; onInteractOutside đọc ref để quyết định giữ Dialog — KHÔNG chặn Select
+  // tự đóng (không stopPropagation), nên Select vẫn đóng đúng UX.
+  const POPUP =
+    '[data-slot="select-content"],[data-slot="dropdown-menu-content"],[data-slot="popover-content"],[data-radix-popper-content-wrapper]'
+  const popupOpenAtDownRef = React.useRef(false)
+  React.useEffect(() => {
+    const onDown = () => {
+      popupOpenAtDownRef.current = !!document.querySelector(POPUP)
+    }
+    document.addEventListener("pointerdown", onDown, true)
+    return () => document.removeEventListener("pointerdown", onDown, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   return (
     <DialogPortal>
-      <DialogOverlay />
+      <DialogOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-popover p-4 text-sm text-popover-foreground ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
           className
         )}
+        onInteractOutside={(event) => {
+          // Giữ Dialog khi tương tác thật ra là để đóng popup con:
+          // (a) target nằm trong popup (bấm chọn item), HOẶC
+          // (b) lúc bắt đầu bấm (capture) đang có popup mở — kể cả Select đã tự đóng
+          //     trước khi event này chạy (race), nhờ ref ghi ở pha capture.
+          const original = (
+            event as CustomEvent<{ originalEvent?: Event }>
+          ).detail?.originalEvent
+          const target = (original?.target ?? event.target) as Element | null
+          if (target?.closest?.(POPUP) || popupOpenAtDownRef.current) {
+            event.preventDefault()
+          }
+          onInteractOutside?.(event)
+        }}
         {...props}
       >
         {children}

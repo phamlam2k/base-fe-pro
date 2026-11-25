@@ -18,6 +18,7 @@ interface RawMember {
   name: string;
   email: string;
   role: Member["role"];
+  businessRole: string;
   customTitle: string;
   createdAt: string;
 }
@@ -29,6 +30,7 @@ function toMember(raw: RawMember): Member {
     name: raw.name,
     email: raw.email,
     role: raw.role,
+    businessRole: raw.businessRole ?? "",
     customTitle: raw.customTitle ?? "",
     createdAt: raw.createdAt,
   };
@@ -37,7 +39,8 @@ function toMember(raw: RawMember): Member {
 const ORDER_FIELD: Record<string, string> = { createdAt: "created_at", role: "role" };
 
 export async function GET(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:view");
+  // Dùng cho ProjectMembersCard (chọn thành viên gán dự án) — manager có projects:view.
+  const auth = requireAuth(request, ["orgs:view", "projects:view"]);
   if ("response" in auth) return auth.response;
 
   const query = memberListQuerySchema.safeParse(

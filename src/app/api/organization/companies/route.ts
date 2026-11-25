@@ -17,7 +17,8 @@ const ORDER_FIELD: Record<string, string> = {
 };
 
 export async function GET(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:view");
+  // Manager đọc để chọn công ty (project console); SuperAdmin đọc cho trang Công ty.
+  const auth = requireAuth(request, ["projects:view", "companies:manage"]);
   if ("response" in auth) return auth.response;
 
   const query = companyListQuerySchema.safeParse(
@@ -44,7 +45,7 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:manage");
+  const auth = requireAuth(request, "companies:manage");
   if ("response" in auth) return auth.response;
 
   const body = await request.json().catch(() => null);

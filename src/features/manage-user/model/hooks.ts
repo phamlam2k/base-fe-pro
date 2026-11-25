@@ -48,3 +48,18 @@ export function useDeleteUser() {
     onError: (error) => toast.error(error.message),
   });
 }
+
+/** MAD-36 — Admin reset mật khẩu; trả về mật khẩu mới để hiển thị 1 lần. */
+export function useResetPassword() {
+  const queryClient = useQueryClient();
+  const t = useTranslations("users");
+
+  return useMutation({
+    mutationFn: (id: string) => userApi.resetPassword(id),
+    onSuccess: () => {
+      toast.success(t("passwordReset"));
+      queryClient.invalidateQueries({ queryKey: userQueries.all() });
+    },
+    onError: (error) => toast.error(error.message),
+  });
+}

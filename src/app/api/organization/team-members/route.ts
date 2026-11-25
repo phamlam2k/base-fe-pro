@@ -25,7 +25,7 @@ function toTeamMember(raw: RawTeamMember): TeamMember {
 }
 
 export async function GET(request: NextRequest) {
-  const auth = requireAuth(request, "orgs:view");
+  const auth = requireAuth(request, "projects:view");
   if ("response" in auth) return auth.response;
 
   const teamId = request.nextUrl.searchParams.get("teamId");

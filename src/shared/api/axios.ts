@@ -39,19 +39,58 @@ export const apiClient = axios.create({
  */
 apiClient.interceptors.request.use((config) => config);
 
+// Chống VÒNG LẶP đăng nhập: khi tài khoản đã bị xoá/khoá nhưng cookie phiên (JWT)
+// vẫn còn hợp lệ về cấu trúc, proxy cứ bật /login ↔ /dashboard và mọi request 401 →
+// reload liên tục ở trang chủ. Giải: (1) khi 401, XOÁ cookie phiên rồi mới về /login
+// (proxy hết coi là đã đăng nhập); (2) giới hạn TỐI ĐA 3 lần rồi DỪNG để không lặp.
+const AUTH_401_KEY = "auth401Count";
+let handling401 = false;
+
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Có request thành công → reset bộ đếm 401.
+    if (typeof window !== "undefined") sessionStorage.removeItem(AUTH_401_KEY);
+    return response;
+  },
   (error: AxiosError<ApiErrorBody>) => {
     const status = error.response?.status ?? 0;
     const body = error.response?.data?.error;
 
-    // Session expired mid-navigation: hard-redirect to login (skip the login
-    // request itself, which legitimately returns 401 on bad credentials).
+    // Bỏ qua chính request đăng nhập (401 do sai mật khẩu là hợp lệ) và khi đang ở
+    // sẵn trang /login (tránh tự redirect vào chính nó).
     const isLoginCall = error.config?.url?.includes("/auth/login");
-    if (status === 401 && typeof window !== "undefined" && !isLoginCall) {
-      window.location.assign(
-        `${ROUTES.login}?redirect=${encodeURIComponent(window.location.pathname)}`,
-      );
+    const onLoginPage =
+      typeof window !== "undefined" &&
+      window.location.pathname === ROUTES.login;
+
+    if (
+      status === 401 &&
+      typeof window !== "undefined" &&
+      !isLoginCall &&
+      !onLoginPage &&
+      !handling401
+    ) {
+      const count = Number(sessionStorage.getItem(AUTH_401_KEY) ?? "0") + 1;
+      sessionStorage.setItem(AUTH_401_KEY, String(count));
+      if (count <= 3) {
+        handling401 = true;
+        void (async () => {
+          // Xoá cookie phiên trước, rồi về /login → proxy không đẩy lại /dashboard.
+          try {
+            await fetch(`${env.NEXT_PUBLIC_API_URL}/auth/logout`, {
+              method: "POST",
+            });
+          } catch {
+            // ignore — vẫn điều hướng về login
+          }
+          window.location.assign(
+            `${ROUTES.login}?redirect=${encodeURIComponent(
+              window.location.pathname,
+            )}`,
+          );
+        })();
+      }
+      // count > 3: đã thử 3 lần → DỪNG (không redirect nữa) để cắt vòng lặp vô hạn.
     }
 
     return Promise.reject(
@@ -64,6 +103,13 @@ apiClient.interceptors.response.use(
     );
   },
 );
+
+/** Lý do lỗi do backend trả về (qua route BFF); lỗi mạng/timeout → null để dùng câu chung. */
+export function backendErrorMessage(error: unknown): string | null {
+  return error instanceof ApiError && error.code === "BACKEND_ERROR"
+    ? error.message
+    : null;
+}
 
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;

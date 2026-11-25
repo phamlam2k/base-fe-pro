@@ -167,8 +167,18 @@ function TeamTree({ projectId }: { projectId: string }) {
   const [typeFilter, setTypeFilter] = React.useState<TeamType | "all">("all");
 
   const roots = teams.filter((tm) => tm.parentTeamId === null);
-  const childrenOf = (parentId: string) =>
-    teams.filter((tm) => tm.parentTeamId === parentId);
+  // 1 nhóm có thể nằm dưới nhiều cha: con của `parent` trong ngữ cảnh Hợp đồng
+  // `packageId` = nhóm có vị trí (parent, packageId) — NT dưới TVGS chỉ hiện ở đúng HĐ.
+  const childrenOf = (parent: Team, packageId: string | null) =>
+    teams.filter((tm) =>
+      tm.placements.length
+        ? tm.placements.some(
+            (pl) =>
+              pl.parentId === parent.id &&
+              (parent.teamType === "PACKAGE" || !packageId || pl.packageId === packageId),
+          )
+        : tm.parentTeamId === parent.id,
+    );
   const filtered = teams.filter((tm) => tm.teamType === typeFilter);
 
   const rowActions = {
@@ -224,25 +234,17 @@ function TeamTree({ projectId }: { projectId: string }) {
             </div>
           )
         ) : (
-          // Full tree
+          // Full tree (đệ quy: Gói thầu → TVGS → Nhà Thầu/Thí Nghiệm)
           roots.map((root) => (
-            <div key={root.id} className="grid gap-2">
-              <TeamRow team={root} {...rowActions} />
-              <div className="ml-6 grid gap-2 border-l pl-4">
-                {childrenOf(root.id).length === 0 ? (
-                  <p className="text-muted-foreground py-1 text-sm">
-                    {t("teams.noChildren")}
-                  </p>
-                ) : (
-                  childrenOf(root.id).map((child) => (
-                    <div key={child.id} className="flex items-start gap-2">
-                      <CornerDownRight className="text-muted-foreground mt-2.5 size-4 shrink-0" />
-                      <TeamRow team={child} {...rowActions} />
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <TeamSubtree
+              key={root.id}
+              team={root}
+              packageId={root.teamType === "PACKAGE" ? root.id : null}
+              childrenOf={childrenOf}
+              depth={0}
+              actions={rowActions}
+              noChildrenLabel={t("teams.noChildren")}
+            />
           ))
         )}
       </CardContent>
@@ -266,6 +268,7 @@ function TeamTree({ projectId }: { projectId: string }) {
         onOpenChange={(open) => !open && setTeamToDelete(null)}
         title={t("teams.deleteTitle", { name: teamToDelete?.name ?? "" })}
         description={
+          teamToDelete?.teamType === "PACKAGE" ||
           teamToDelete?.teamType === "SUPERVISION"
             ? t("teams.deleteRootDescription")
             : t("teams.deleteDescription")
@@ -279,6 +282,65 @@ function TeamTree({ projectId }: { projectId: string }) {
         }}
       />
     </Card>
+  );
+}
+
+type RowActions = {
+  onManage: (team: Team) => void;
+  onEdit: (team: Team) => void;
+  onDelete: (team: Team) => void;
+};
+
+/** Đệ quy render 1 nhánh cây: Gói thầu → TVGS → Nhà Thầu/Thí Nghiệm. */
+function TeamSubtree({
+  team,
+  packageId,
+  childrenOf,
+  depth,
+  actions,
+  noChildrenLabel,
+}: {
+  team: Team;
+  /** Hợp đồng của nhánh đang vẽ (gốc PACKAGE). */
+  packageId: string | null;
+  childrenOf: (parent: Team, packageId: string | null) => Team[];
+  depth: number;
+  actions: RowActions;
+  noChildrenLabel: string;
+}) {
+  const children = childrenOf(team, packageId);
+  // Gói thầu / TVGS chưa có nhóm con → hiển thị dòng gợi ý.
+  const showEmpty =
+    (team.teamType === "PACKAGE" || team.teamType === "SUPERVISION") &&
+    children.length === 0;
+  return (
+    <div className="grid gap-2">
+      <div className="flex items-start gap-2">
+        {depth > 0 ? (
+          <CornerDownRight className="text-muted-foreground mt-2.5 size-4 shrink-0" />
+        ) : null}
+        <TeamRow team={team} {...actions} />
+      </div>
+      {children.length > 0 || showEmpty ? (
+        <div className="ml-6 grid gap-2 border-l pl-4">
+          {showEmpty ? (
+            <p className="text-muted-foreground py-1 text-sm">{noChildrenLabel}</p>
+          ) : (
+            children.map((child) => (
+              <TeamSubtree
+                key={child.id}
+                team={child}
+                packageId={packageId}
+                childrenOf={childrenOf}
+                depth={depth + 1}
+                actions={actions}
+                noChildrenLabel={noChildrenLabel}
+              />
+            ))
+          )}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -303,10 +365,13 @@ function TeamRow({
         {t("teams.memberCount", { count: team.memberCount })}
       </span>
       <div className="ml-auto flex items-center gap-1">
-        <Button variant="outline" size="sm" onClick={() => onManage(team)}>
-          <UsersRound />
-          {t("teamMembers.manage")}
-        </Button>
+        {/* Gói thầu chỉ là nhóm cha — không thêm thành viên, chỉ thêm nhóm con. */}
+        {team.teamType !== "PACKAGE" ? (
+          <Button variant="outline" size="sm" onClick={() => onManage(team)}>
+            <UsersRound />
+            {t("teamMembers.manage")}
+          </Button>
+        ) : null}
         <PermissionGate permission="orgs:manage">
           <Button
             variant="ghost"

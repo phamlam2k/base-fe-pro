@@ -6,6 +6,7 @@ import { Badge } from "@/shared/ui/badge";
 import type { TeamType } from "@/entities/team/model/team";
 
 const TEAM_TYPE_STYLE: Record<TeamType, string> = {
+  PACKAGE: "border-emerald-300 text-emerald-700 dark:text-emerald-300",
   SUPERVISION: "border-blue-300 text-blue-700 dark:text-blue-300",
   CONTRACTOR: "border-orange-300 text-orange-700 dark:text-orange-300",
   TESTING: "border-violet-300 text-violet-700 dark:text-violet-300",

@@ -60,8 +60,11 @@ function SelectTrigger({
 function SelectContent({
   className,
   children,
-  position = "item-aligned",
-  align = "center",
+  // "popper" (thả xuống như dropdown thường, dùng floating-ui) NHẸ & MƯỢT hơn nhiều
+  // so với "item-aligned" (phải đo mọi item để căn item chọn dưới trigger) — đặc biệt
+  // giảm lag khi Select nằm trong Dialog/modal.
+  position = "popper",
+  align = "start",
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (

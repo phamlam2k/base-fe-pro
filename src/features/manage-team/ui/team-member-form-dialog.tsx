@@ -39,16 +39,29 @@ import {
 } from "@/entities/team-member";
 import { TEAM_ROLES } from "@/entities/team-member";
 import type { UserOption } from "@/entities/user";
+import type { TeamType } from "@/entities/team";
+
+/**
+ * Vai trò nghiệp vụ (User.role) tương ứng loại nhóm → picker chỉ hiện đúng người:
+ * nhóm TVGS→supervisor, Nhà thầu→contractor, Thí nghiệm→lab. PACKAGE không thêm người.
+ */
+const BUSINESS_ROLE_BY_TEAM_TYPE: Partial<Record<TeamType, string>> = {
+  SUPERVISION: "supervisor",
+  CONTRACTOR: "contractor",
+  TESTING: "lab",
+};
 
 /** Pick an existing user and add them to a team as Lead or Member. */
 export function TeamMemberFormDialog({
   open,
   onOpenChange,
   teamId,
+  teamType,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   teamId: string;
+  teamType?: TeamType;
 }) {
   const t = useTranslations("organization");
   const tCommon = useTranslations("common");
@@ -87,7 +100,11 @@ export function TeamMemberFormDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4" noValidate>
             <div className="grid gap-1.5">
               <Label>{t("form.person")}</Label>
-              <UserPicker value={picked} onChange={setPicked} />
+              <UserPicker
+                value={picked}
+                onChange={setPicked}
+                role={teamType ? BUSINESS_ROLE_BY_TEAM_TYPE[teamType] : undefined}
+              />
               <p className="text-muted-foreground text-xs">{t("form.personHint")}</p>
             </div>
 
