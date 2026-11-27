@@ -850,7 +850,7 @@
     "workDescription": "Đối tượng nghiệm thu",
     "workDescriptionPlaceholder": "VD: Đổ bê tông sàn tầng 5, khu A1-A4",
     "proposedAt": "Thời gian bắt đầu nghiệm thu",
-    "proposedAtHint": "Tối thiểu sau 24 giờ kể từ bây giờ để TVGS kịp xác nhận.",
+    "proposedAtHint": "Chọn thời điểm sau hiện tại; TVGS cần xác nhận trước giờ này.",
     "photos": "Ảnh hiện trạng",
     "viewInvoice": "Xem hóa đơn / CO-CQ (PDF)",
     "photosHint": "Đính kèm ảnh sẽ bổ sung khi nối camera pipeline.",
@@ -866,7 +866,7 @@
       "descriptionRequired": "Nhập mô tả công việc",
       "materialRequired": "Nhập chủng loại vật liệu",
       "quantityRequired": "Nhập khối lượng",
-      "proposedAtMin": "Thời gian bắt đầu nghiệm thu phải sau hiện tại ít nhất 24 giờ"
+      "proposedAtMin": "Thời gian bắt đầu nghiệm thu phải sau thời điểm hiện tại"
     },
     "inboxTitle": "Hộp thư yêu cầu nghiệm thu",
     "newRequest": "Tạo yêu cầu nghiệm thu",

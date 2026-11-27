@@ -45,7 +45,6 @@ import {
 } from "@/features/create-acceptance-request/model/hooks";
 import {
   createAcceptanceRequestSchema,
-  MIN_PROPOSED_LEAD_MS,
   type AcceptanceRequestValues,
 } from "@/features/create-acceptance-request/model/schemas";
 import { useSelectedProjectStore } from "@/shared/lib/selected-project";
@@ -619,7 +618,7 @@ export function CreateAcceptanceRequestForm() {
                   <FormControl>
                     <Input
                       type="datetime-local"
-                      min={toDatetimeLocalVN(new Date(Date.now() + MIN_PROPOSED_LEAD_MS))}
+                      min={toDatetimeLocalVN(new Date())}
                       {...field}
                     />
                   </FormControl>

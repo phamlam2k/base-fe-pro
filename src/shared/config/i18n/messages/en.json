@@ -850,7 +850,7 @@
     "workDescription": "Acceptance subject",
     "workDescriptionPlaceholder": "E.g. Pour floor slab F5, zone A1-A4",
     "proposedAt": "Inspection start time",
-    "proposedAtHint": "At least 24 hours from now so the supervisor has time to confirm.",
+    "proposedAtHint": "Pick a time after now; the supervisor must confirm before then.",
     "photos": "Site photos",
     "viewInvoice": "View invoice / CO-CQ (PDF)",
     "photosHint": "Photo attachment coming with the camera pipeline.",
@@ -866,7 +866,7 @@
       "descriptionRequired": "Enter a work description",
       "materialRequired": "Enter the material type",
       "quantityRequired": "Enter the quantity",
-      "proposedAtMin": "Inspection start time must be at least 24 hours from now"
+      "proposedAtMin": "Inspection start time must be after now"
     },
     "inboxTitle": "Acceptance request inbox",
     "newRequest": "Create acceptance request",

@@ -6,6 +6,5 @@ export {
 } from "./model/hooks";
 export {
   createAcceptanceRequestSchema,
-  MIN_PROPOSED_LEAD_MS,
   type AcceptanceRequestValues,
 } from "./model/schemas";

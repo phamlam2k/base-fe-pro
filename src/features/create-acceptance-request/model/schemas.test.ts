@@ -13,22 +13,22 @@ const base = {
 };
 const at = (hoursFromNow: number) => toDatetimeLocalVN(new Date(Date.now() + hoursFromNow * HOUR));
 
-describe("proposedAt tối thiểu 24h", () => {
+describe("proposedAt không ở quá khứ", () => {
   const schema = createAcceptanceRequestSchema();
 
-  it("chặn giờ < 24h tới", () => {
-    const r = schema.safeParse({ ...base, proposedAt: at(23) });
+  it("chặn giờ ở quá khứ", () => {
+    const r = schema.safeParse({ ...base, proposedAt: at(-1) });
     expect(r.success).toBe(false);
     expect(r.error?.issues[0].path).toEqual(["proposedAt"]);
   });
 
-  it("cho giờ ≥ 24h tới hoặc bỏ trống", () => {
-    expect(schema.safeParse({ ...base, proposedAt: at(25) }).success).toBe(true);
+  it("cho giờ sắp tới (không cần 24h) hoặc bỏ trống", () => {
+    expect(schema.safeParse({ ...base, proposedAt: at(1) }).success).toBe(true);
     expect(schema.safeParse({ ...base, proposedAt: "" }).success).toBe(true);
   });
 
   it("sửa & gửi lại giữ nguyên giờ cũ thì không kiểm", () => {
-    const old = at(2);
+    const old = at(-2);
     expect(createAcceptanceRequestSchema(undefined, old).safeParse({ ...base, proposedAt: old }).success).toBe(true);
   });
 });

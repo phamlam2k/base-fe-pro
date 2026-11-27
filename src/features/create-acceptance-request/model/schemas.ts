@@ -2,8 +2,8 @@ import { z } from "zod";
 
 type TFn = (key: string) => string;
 
-/** Giờ bắt đầu nghiệm thu phải cách hiện tại ít nhất 24h (khớp backend) để TVGS kịp xác nhận. */
-export const MIN_PROPOSED_LEAD_MS = 24 * 60 * 60 * 1000;
+/** Giờ bắt đầu nghiệm thu không được ở quá khứ (khớp backend, nới 5 phút lệch đồng hồ). */
+export const PROPOSED_GRACE_MS = 5 * 60 * 1000;
 
 /** "YYYY-MM-DDTHH:mm" của <input datetime-local> là GIỜ VN → epoch ms (ISO đủ thì parse thẳng). */
 function proposedAtMs(value: string): number {
@@ -14,7 +14,7 @@ function proposedAtMs(value: string): number {
 
 /**
  * MAD-8/9 — schema tạo phiếu nghiệm thu (dùng chung vật liệu + công việc).
- * ``initialProposedAt``: giờ sẵn có khi sửa & gửi lại — giữ nguyên thì không kiểm 24h.
+ * ``initialProposedAt``: giờ sẵn có khi sửa & gửi lại — giữ nguyên thì không kiểm.
  */
 export function createAcceptanceRequestSchema(t?: TFn, initialProposedAt?: string) {
   const msg = (key: string, fallback: string) => (t ? t(key) : fallback);
@@ -43,14 +43,14 @@ export function createAcceptanceRequestSchema(t?: TFn, initialProposedAt?: strin
       if (
         v.proposedAt &&
         v.proposedAt !== initialProposedAt &&
-        proposedAtMs(v.proposedAt) < Date.now() + MIN_PROPOSED_LEAD_MS
+        proposedAtMs(v.proposedAt) < Date.now() - PROPOSED_GRACE_MS
       )
         ctx.addIssue({
           path: ["proposedAt"],
           code: z.ZodIssueCode.custom,
           message: msg(
             "validation.proposedAtMin",
-            "Thời gian bắt đầu nghiệm thu phải sau hiện tại ít nhất 24 giờ",
+            "Thời gian bắt đầu nghiệm thu phải sau thời điểm hiện tại",
           ),
         });
       if (v.type === "material") {
